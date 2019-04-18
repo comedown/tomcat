@@ -240,6 +240,7 @@ public final class ClassLoaderFactory {
                 });
     }
 
+    /**  */
     private static boolean validateFile(File file,
             RepositoryType type) throws IOException {
         if (RepositoryType.DIR == type || RepositoryType.GLOB == type) {
@@ -308,9 +309,12 @@ public final class ClassLoaderFactory {
         JAR,
         URL
     }
-    
+
+    /** 资源仓库 */
     public static class Repository {
+        // 资源路径
         private String location;
+        // 资源类型
         private RepositoryType type;
         
         public Repository(String location, RepositoryType type) {

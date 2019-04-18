@@ -145,6 +145,7 @@ public class CatalinaProperties {
         }
 
         // Register the properties as system properties
+        // 注册Catalina属性配置到系统属性
         Enumeration<?> enumeration = properties.propertyNames();
         while (enumeration.hasMoreElements()) {
             String name = (String) enumeration.nextElement();

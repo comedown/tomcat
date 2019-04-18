@@ -41,6 +41,12 @@ import org.apache.juli.logging.LogFactory;
  * other classes they depend on, such as an XML parser) out of the system
  * class path and therefore not visible to application level classes.
  *
+ * <br><br>
+ * Catalina的引导加载器。该应用程序构造一个类加载器用于加载Catalina内部的类（"Server"中在
+ * "catalina.home"下面的所有JAR文件的集合），并开始容器的定期规律的执行。这种迂回的方式目的
+ * 是为了让Catalina内部的类（和任何Catalina所依赖的其他类，比如XML解析器）不在系统类路径中，
+ * 因此，它们对应用级别的类是不可见的。
+ *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
@@ -77,6 +83,7 @@ public final class Bootstrap {
 
     private void initClassLoaders() {
         try {
+            // URLClassLoader
             commonLoader = createClassLoader("common", null);
             if( commonLoader == null ) {
                 // no config file, default to this loader - we might be in a 'single' env.
@@ -91,10 +98,11 @@ public final class Bootstrap {
         }
     }
 
-
+    /** 构建资源类加载器 */
     private ClassLoader createClassLoader(String name, ClassLoader parent)
         throws Exception {
 
+        // 获取common类加载器加载的目录
         String value = CatalinaProperties.getProperty(name + ".loader");
         if ((value == null) || (value.equals("")))
             return parent;
@@ -141,6 +149,9 @@ public final class Bootstrap {
 
     /**
      * System property replacement in the given string.
+     *
+     * <br><br>
+     * 解析占位符 ${}
      * 
      * @param str The original string
      * @return the modified string
@@ -483,11 +494,16 @@ public final class Bootstrap {
     /**
      * Set the <code>catalina.home</code> System property to the current
      * working directory if it has not been set.
+     *
+     * <br><br>
+     * 如果当前工作目录还未设置系统属性<code>catalina.home</code>，则设置它。
+     *
      */
     private void setCatalinaHome() {
-
+        // 如果设置了，直接返回
         if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
             return;
+        // 获取bootstrap.jar
         File bootstrapJar =
             new File(System.getProperty("user.dir"), "bootstrap.jar");
         if (bootstrapJar.exists()) {
@@ -501,7 +517,7 @@ public final class Bootstrap {
                 System.setProperty(Globals.CATALINA_HOME_PROP,
                                    System.getProperty("user.dir"));
             }
-        } else {
+        } else { // 如果不存在bootstrap.jar，则设置Catalina.home为用户目录
             System.setProperty(Globals.CATALINA_HOME_PROP,
                                System.getProperty("user.dir"));
         }

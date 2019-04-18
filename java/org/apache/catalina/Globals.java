@@ -21,6 +21,9 @@ import org.apache.tomcat.util.compat.JreVendor;
 /**
  * Global constants that are applicable to multiple packages within Catalina.
  *
+ * <br><br>
+ * 适用于Catalina中大多数的包的全局配置。
+ *
  * @author Craig R. McClanahan
  */
 public final class Globals {
@@ -322,6 +325,10 @@ public final class Globals {
     /**
      * Name of the system property containing
      * the tomcat product installation path
+     *
+     * <br><br>
+     * 包含Tomcat产品按照路径的系统属性名称。
+     *
      */
     public static final String CATALINA_HOME_PROP = "catalina.home";
 
@@ -329,6 +336,10 @@ public final class Globals {
     /**
      * Name of the system property containing
      * the tomcat instance installation path
+     *
+     * <br><br>
+     * 包含Tomcat实例按照路径的系统属性名称。
+     *
      */
     public static final String CATALINA_BASE_PROP = "catalina.base";
 
