@@ -73,7 +73,9 @@ public final class Bootstrap {
     private Object catalinaDaemon = null;
 
 
+    // 负责加载catalina.home\lib，catalina.base\lib下面所有的class和jar包
     ClassLoader commonLoader = null;
+    // commonLoader作为父加载器
     ClassLoader catalinaLoader = null;
     ClassLoader sharedLoader = null;
 
@@ -102,8 +104,9 @@ public final class Bootstrap {
     private ClassLoader createClassLoader(String name, ClassLoader parent)
         throws Exception {
 
-        // 获取common类加载器加载的目录
+        // 获取不同类加载器加载的目录
         String value = CatalinaProperties.getProperty(name + ".loader");
+        // 资源为空，返回父加载器
         if ((value == null) || (value.equals("")))
             return parent;
 
@@ -229,6 +232,7 @@ public final class Bootstrap {
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
         Object paramValues[] = new Object[1];
         paramValues[0] = sharedLoader;
+        // Catalina类不在classpath下，不能直接调用
         Method method =
             startupInstance.getClass().getMethod(methodName, paramTypes);
         method.invoke(startupInstance, paramValues);
@@ -420,6 +424,7 @@ public final class Bootstrap {
             Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
         }
 
+        // 命令行参数，支持start，stop
         try {
             String command = "start";
             if (args.length > 0) {
@@ -503,7 +508,7 @@ public final class Bootstrap {
         // 如果设置了，直接返回
         if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
             return;
-        // 获取bootstrap.jar
+        // 获取bootstrap.jar，user.dir表示项目根目录
         File bootstrapJar =
             new File(System.getProperty("user.dir"), "bootstrap.jar");
         if (bootstrapJar.exists()) {

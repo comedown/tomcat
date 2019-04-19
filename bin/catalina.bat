@@ -1,4 +1,6 @@
 @echo off
+rem 注释命令，不执行
+
 rem Licensed to the Apache Software Foundation (ASF) under one or more
 rem contributor license agreements.  See the NOTICE file distributed with
 rem this work for additional information regarding copyright ownership.
@@ -106,6 +108,8 @@ rem                   Example (all one line)
 rem                   set TITLE=Tomcat.Cluster#1.Server#1 [%DATE% %TIME%]
 rem ---------------------------------------------------------------------------
 
+rem setlocl命令将环境变量本地化，运行 setlocal 后所做的环境更改是批处理文件的本地更改
+
 setlocal
 
 rem Suppress Terminate batch job on CTRL+C
@@ -171,6 +175,7 @@ rem quotes into the CLASSPATH
 if "%CLASSPATH%" == "" goto emptyClasspath
 set "CLASSPATH=%CLASSPATH%;"
 :emptyClasspath
+rem 把bootstrap.jar加入到classpath下面
 set "CLASSPATH=%CLASSPATH%%CATALINA_HOME%\bin\bootstrap.jar"
 
 if not "%CATALINA_TMPDIR%" == "" goto gotTmpdir
@@ -180,6 +185,7 @@ set "CATALINA_TMPDIR=%CATALINA_BASE%\temp"
 rem Add tomcat-juli.jar to classpath
 rem tomcat-juli.jar can be over-ridden per instance
 if not exist "%CATALINA_BASE%\bin\tomcat-juli.jar" goto juliClasspathHome
+rem 把tomcat-juli.jar加入到classpath下
 set "CLASSPATH=%CLASSPATH%;%CATALINA_BASE%\bin\tomcat-juli.jar"
 goto juliClasspathDone
 :juliClasspathHome
@@ -232,7 +238,9 @@ echo Using JAVA_HOME:       "%JAVA_HOME%"
 :java_dir_displayed
 echo Using CLASSPATH:       "%CLASSPATH%"
 
+rem 执行命令变量
 set _EXECJAVA=%_RUNJAVA%
+rem 引导类
 set MAINCLASS=org.apache.catalina.startup.Bootstrap
 set ACTION=start
 set SECURITY_POLICY_FILE=
@@ -297,9 +305,13 @@ goto execCmd
 
 :doStart
 shift
+rem 如果TITLE为空，设置默认：Tomcat
 if "%TITLE%" == "" set TITLE=Tomcat
+rem start：启动单独的“命令提示符”窗口来运行指定程序或命令。如果在没有参数的情况下使用，start 将打开第二个命令提示符窗口。 
+rem start ["title"] [/dPath] [/i] [/min] [/max] [{/separate | /shared}] [{/low | /normal | /high | /realtime | /abovenormal | belownormal}] [/wait] [/b] [FileName] [parameters] 
 set _EXECJAVA=start "%TITLE%" %_RUNJAVA%
 if not ""%1"" == ""-security"" goto execCmd
+rem shift命令将参数向前移动，比如%1赋值给%0，%2赋值给%1
 shift
 echo Using Security Manager
 set "SECURITY_POLICY_FILE=%CATALINA_BASE%\conf\catalina.policy"
@@ -335,6 +347,7 @@ goto setArgs
 rem Execute Java with the applicable properties
 if not "%JPDA%" == "" goto doJpda
 if not "%SECURITY_POLICY_FILE%" == "" goto doSecurity
+rem 启动BootStrap，并设置系统变量和classpath
 %_EXECJAVA% %LOGGING_CONFIG% %LOGGING_MANAGER% %JAVA_OPTS% %CATALINA_OPTS% %DEBUG_OPTS% -D%ENDORSED_PROP%="%JAVA_ENDORSED_DIRS%" -classpath "%CLASSPATH%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
 goto end
 :doSecurity

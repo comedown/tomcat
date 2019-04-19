@@ -23,6 +23,11 @@ import org.apache.catalina.startup.CatalinaProperties;
 /**
  * Util class to protect Catalina against package access and insertion.
  * The code are been moved from Catalina.java
+ *
+ * <br><br>
+ * 单例：
+ * 用于保护Catalina包不被访问和插入的工具类。
+ *
  * @author the Catalina.java authors
  * @author Jean-Francois Arcand
  */

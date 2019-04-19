@@ -31,6 +31,7 @@ public final class SecurityClassLoad {
     public static void securityClassLoad(ClassLoader loader)
         throws Exception {
 
+        // 通过系统变量开启SecurityManager。-Djava.security.manager
         if( System.getSecurityManager() == null ){
             return;
         }
@@ -48,7 +49,7 @@ public final class SecurityClassLoad {
         loadTomcatPackage(loader);
     }
 
-
+    /** 加载org.apache.catalina.core包下面的class */
     private static final void loadCorePackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.core.";
@@ -67,7 +68,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
 
-
+    /** 加载org.apache.catalina.loader包下的类 */
     private static final void loadLoaderPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
@@ -124,7 +125,7 @@ public final class SecurityClassLoad {
             loader.loadClass(basePackage + "AccessLogValve$3");
         }
 
-
+    /** 加载org.apache.coyote包下的类 */
     private static final void loadCoyotePackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.coyote.";

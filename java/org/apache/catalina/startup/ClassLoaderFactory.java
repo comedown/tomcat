@@ -295,9 +295,11 @@ public final class ClassLoaderFactory {
     }
 
 
+    /** 目录或文件转URL */
     private static URL buildClassLoaderUrl(File file) throws MalformedURLException {
         // Could be a directory or a file
         String fileUrlString = file.toURI().toString();
+        // url转义字符，%21=!
         fileUrlString = fileUrlString.replaceAll("!/", "%21/");
         return new URL(fileUrlString);
     }

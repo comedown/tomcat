@@ -549,6 +549,9 @@ public class Catalina {
 
     /**
      * Start a new server instance.
+     *
+     * <br><br>
+     * 创建一个新的server实例
      */
     public void load() {
 
@@ -557,8 +560,10 @@ public class Catalina {
         }
         loaded = true;
 
+        // 纳秒
         long t1 = System.nanoTime();
 
+        // 初始化CATALINA_HOME、CATALINA_BASE、temp目录
         initDirs();
 
         // Before digester - it may be needed
@@ -803,6 +808,10 @@ public class Catalina {
 
     /**
      * Print usage information for this application.
+     *
+     * <br><br>
+     * 打印命令行用法
+     *
      */
     protected void usage() {
 
