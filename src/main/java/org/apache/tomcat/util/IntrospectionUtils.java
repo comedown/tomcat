@@ -37,7 +37,7 @@ public final class IntrospectionUtils {
 
 
     private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( IntrospectionUtils.class );
+            org.apache.juli.logging.LogFactory.getLog( IntrospectionUtils.class );
 
     /**
      * Call execute() - any ant-like task should work
@@ -136,7 +136,7 @@ public final class IntrospectionUtils {
      */
     @Deprecated
     public static String guessInstall(String installSysProp,
-            String homeSysProp, String jarName) {
+                                      String homeSysProp, String jarName) {
         return guessInstall(installSysProp, homeSysProp, jarName, null);
     }
 
@@ -154,7 +154,7 @@ public final class IntrospectionUtils {
      */
     @Deprecated
     public static String guessInstall(String installSysProp,
-            String homeSysProp, String jarName, String classFile) {
+                                      String homeSysProp, String jarName, String classFile) {
         String install = null;
         String home = null;
 
@@ -284,7 +284,7 @@ public final class IntrospectionUtils {
 
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
-            boolean invokeSetProperty) {
+                                      boolean invokeSetProperty) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
@@ -325,14 +325,14 @@ public final class IntrospectionUtils {
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
-                    // Try a setFoo ( long )
+                        // Try a setFoo ( long )
                     }else if ("java.lang.Long".equals(paramType.getName())
-                                || "long".equals(paramType.getName())) {
-                            try {
-                                params[0] = Long.valueOf(value);
-                            } catch (NumberFormatException ex) {
-                                ok = false;
-                            }
+                            || "long".equals(paramType.getName())) {
+                        try {
+                            params[0] = Long.valueOf(value);
+                        } catch (NumberFormatException ex) {
+                            ok = false;
+                        }
 
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())
@@ -489,7 +489,7 @@ public final class IntrospectionUtils {
      * Replace ${NAME} with the property value
      */
     public static String replaceProperties(String value,
-            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[]) {
+                                           Hashtable<Object,Object> staticProp, PropertySource dynamicProp[]) {
         if (value.indexOf('$') < 0) {
             return value;
         }
@@ -605,8 +605,8 @@ public final class IntrospectionUtils {
                 if (f.exists()) {
                     if (log.isDebugEnabled())
                         log.debug("Detected strange java.home value "
-                            + System.getProperty("java.home")
-                            + ", it should point to jre");
+                                + System.getProperty("java.home")
+                                + ", it should point to jre");
                 }
             }
             URL url = new URL("file", "", f.getAbsolutePath());
@@ -715,7 +715,7 @@ public final class IntrospectionUtils {
      */
     @Deprecated
     public static URL[] getClassPath(String dir, String cpath,
-            String cpathProp, boolean addTools) throws IOException,
+                                     String cpathProp, boolean addTools) throws IOException,
             MalformedURLException {
         Vector<URL> jarsV = new Vector<URL>();
         if (dir != null) {
@@ -746,7 +746,7 @@ public final class IntrospectionUtils {
     }
 
     static Hashtable<Class<?>,Method[]> objectMethods =
-        new Hashtable<Class<?>,Method[]>();
+            new Hashtable<Class<?>,Method[]>();
 
     public static Method[] findMethods(Class<?> c) {
         Method methods[] = objectMethods.get(c);
@@ -759,9 +759,9 @@ public final class IntrospectionUtils {
     }
 
     @SuppressWarnings("null") // Neither params nor methodParams can be null
-                              // when comparing their lengths
+    // when comparing their lengths
     public static Method findMethod(Class<?> c, String name,
-            Class<?> params[]) {
+                                    Class<?> params[]) {
         Method methods[] = findMethods(c);
         if (methods == null)
             return null;
@@ -832,11 +832,11 @@ public final class IntrospectionUtils {
     }
 
     public static Object callMethod1(Object target, String methodN,
-            Object param1, String typeParam1, ClassLoader cl) throws Exception {
+                                     Object param1, String typeParam1, ClassLoader cl) throws Exception {
         if (target == null || param1 == null) {
             throw new IllegalArgumentException(
                     "IntrospectionUtils: Assert: Illegal params " +
-                    target + " " + param1);
+                            target + " " + param1);
         }
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: callMethod1 " +
@@ -896,7 +896,7 @@ public final class IntrospectionUtils {
     private static final Object[] emptyArray = new Object[] {};
 
     public static Object callMethodN(Object target, String methodN,
-            Object params[], Class<?> typeParams[]) throws Exception {
+                                     Object params[], Class<?> typeParams[]) throws Exception {
         Method m = null;
         m = findMethod(target.getClass(), methodN, typeParams);
         if (m == null) {
@@ -965,6 +965,28 @@ public final class IntrospectionUtils {
         }
         return result;
     }
+
+
+    public static boolean isInstance(Class<?> clazz, String type) {
+        if (type.equals(clazz.getName())) {
+            return true;
+        }
+
+        Class<?>[] ifaces = clazz.getInterfaces();
+        for (Class<?> iface : ifaces) {
+            if (isInstance(iface, type)) {
+                return true;
+            }
+        }
+
+        Class<?> superClazz = clazz.getSuperclass();
+        if (superClazz == null) {
+            return false;
+        } else {
+            return isInstance(superClazz, type);
+        }
+    }
+
 
     // -------------------- Get property --------------------
     // This provides a layer of abstraction
