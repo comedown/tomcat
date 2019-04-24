@@ -26,7 +26,17 @@ import java.util.logging.Logger;
 /** 
  * Hardcoded java.util.logging commons-logging implementation.
  * 
- * In addition, it curr 
+ * In addition, it curr
+ *
+ * <br><br>
+ * java.util.logging commons-logging实现硬编码。
+ *
+ * @see java.util.logging.Logger
+ * @see java.util.logging.LogManager
+ * @see java.util.logging.LogManager.RootLogger
+ * @see java.util.logging.LogManager.LoggerContext
+ * @see ConsoleHandler
+ * @see java.util.logging.SimpleFormatter
  * 
  */
 class DirectJDKLog implements Log {
@@ -37,6 +47,7 @@ class DirectJDKLog implements Log {
      */
     private static final String SIMPLE_FMT="java.util.logging.SimpleFormatter";
     private static final String SIMPLE_CFG="org.apache.juli.JdkLoggerConfig"; //doesn't exist
+    // -Dorg.apache.juli.formatter=[类全路径名]，jvm系统属性
     private static final String FORMATTER="org.apache.juli.formatter";
 
     static {
@@ -49,6 +60,7 @@ class DirectJDKLog implements Log {
             } catch( Throwable t ) {                
             }
             try {
+                // 日志格式
                 Formatter fmt=(Formatter)Class.forName(System.getProperty(FORMATTER, SIMPLE_FMT)).newInstance(); 
                 // it is also possible that the user modified jre/lib/logging.properties - 
                 // but that's really stupid in most cases
