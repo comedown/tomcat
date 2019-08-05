@@ -41,6 +41,7 @@ public class LimitLatch {
         @Override
         protected int tryAcquireShared(int ignored) {
             long newCount = count.incrementAndGet();
+            // 超过阻塞线程
             if (!released && newCount > limit) {
                 // Limit exceeded
                 count.decrementAndGet();
@@ -58,7 +59,9 @@ public class LimitLatch {
     }
 
     private final Sync sync;
+    /** 请求计数器 */
     private final AtomicLong count;
+    /** 最大请求数 */
     private volatile long limit;
     private volatile boolean released = false;
 

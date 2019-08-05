@@ -249,6 +249,7 @@ public class StandardContext extends ContainerBase
      * The set of application listener class names configured for this
      * application, in the order they were encountered in the resulting merged
      * web.xml file.
+     * <p>监听器数组。
      */
     private ApplicationListener applicationListeners[] =
             new ApplicationListener[0];
@@ -282,6 +283,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * The ordered set of ServletContainerInitializers for this web application.
+     * <p>该web应用ServletContainerInitializer的有序集合。
      */
     private Map<ServletContainerInitializer,Set<Class<?>>> initializers =
         new LinkedHashMap<ServletContainerInitializer,Set<Class<?>>>();
@@ -322,6 +324,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * The "correctly configured" flag for this Context.
+     * <p>当前Context容器正确配置标记。
      */
     private boolean configured = false;
 
@@ -337,6 +340,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * The ServletContext implementation associated with this Context.
+     * <p>该上下文容器关联的ServletContext。
      */
     protected ApplicationContext context = null;
 
@@ -427,6 +431,7 @@ public class StandardContext extends ContainerBase
     /**
      * The set of filter configurations (and associated filter instances) we
      * have initialized, keyed by filter name.
+     * <p>filter name -> filter config
      */
     private HashMap<String, ApplicationFilterConfig> filterConfigs =
         new HashMap<String, ApplicationFilterConfig>();
@@ -435,6 +440,7 @@ public class StandardContext extends ContainerBase
     /**
      * The set of filter definitions for this application, keyed by
      * filter name.
+     * <p>此web应用的过滤器定义集合。过滤器名称 -> 过滤器定义对象
      */
     private HashMap<String, FilterDef> filterDefs =
         new HashMap<String, FilterDef>();
@@ -642,6 +648,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * The welcome files for this application.
+     * <p>该web应用欢迎页面路径
      */
     private String welcomeFiles[] = new String[0];
 
@@ -728,7 +735,8 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Cache TTL in ms.
+     * Cache TTL in ms.<i>TTL : Time To Live.</i>
+     * <p>缓存存活时间，单位毫秒。
      */
     protected int cacheTTL = 5000;
 
@@ -898,6 +906,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Should the effective web.xml be logged when the context starts?
+     * <p>是否在启动context的时候打印有效的web.xml日志。在${catalina.home}/conf/context.xml中配置。
      */
     private boolean logEffectiveWebXml = false;
 
@@ -3113,6 +3122,7 @@ public class StandardContext extends ContainerBase
     /**
      * Add a child Container, only if the proposed child is an implementation
      * of Wrapper.
+     * <p>增加子容器，并且子容器只能是Wrapper的实现类。
      *
      * @param child Child container to be added
      *
@@ -5130,7 +5140,9 @@ public class StandardContext extends ContainerBase
         }
 
         // Sort listeners in two arrays
+        // 事件监听器
         ArrayList<Object> eventListeners = new ArrayList<Object>();
+        // 生命周期监听器
         ArrayList<Object> lifecycleListeners = new ArrayList<Object>();
         for (int i = 0; i < results.length; i++) {
             if ((results[i] instanceof ServletContextAttributeListener)
@@ -5176,6 +5188,7 @@ public class StandardContext extends ContainerBase
             return ok;
         }
 
+        // 调用生命周期监听器
         ServletContextEvent event = new ServletContextEvent(getServletContext());
         ServletContextEvent tldEvent = null;
         if (noPluggabilityListeners.size() > 0) {
@@ -5426,11 +5439,13 @@ public class StandardContext extends ContainerBase
     public boolean loadOnStartup(Container children[]) {
 
         // Collect "load on startup" servlets that need to be initialized
+        // 按照loadOnStartUp排序
         TreeMap<Integer, ArrayList<Wrapper>> map =
             new TreeMap<Integer, ArrayList<Wrapper>>();
         for (int i = 0; i < children.length; i++) {
             Wrapper wrapper = (Wrapper) children[i];
             int loadOnStartup = wrapper.getLoadOnStartup();
+            // 如果为负数或不存在，则在第一次调用时初始化。
             if (loadOnStartup < 0)
                 continue;
             Integer key = Integer.valueOf(loadOnStartup);
@@ -5603,6 +5618,7 @@ public class StandardContext extends ContainerBase
                     ((Lifecycle) resources).start();
 
                 // Notify our interested LifecycleListeners
+                // @see ContextConfig，启动配置事件
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
@@ -5612,8 +5628,7 @@ public class StandardContext extends ContainerBase
                     }
                 }
 
-                // Start the Valves in our pipeline (including the basic),
-                // if any
+                // Start the Valves in our pipeline (including the basic),if any.
                 if (pipeline instanceof Lifecycle) {
                     ((Lifecycle) pipeline).start();
                 }
@@ -5703,6 +5718,7 @@ public class StandardContext extends ContainerBase
             mergeParameters();
 
             // Call ServletContainerInitializers
+            // 调用ServletContainerInitializers onStartUp()方法
             for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry :
                 initializers.entrySet()) {
                 try {
@@ -6222,6 +6238,7 @@ public class StandardContext extends ContainerBase
     /**
      * Return a File object representing the base directory for the
      * entire servlet container (i.e. the Engine container if present).
+     * <p> catalina.base 目录
      */
     protected File engineBase() {
         String base=System.getProperty(Globals.CATALINA_BASE_PROP);
@@ -6289,6 +6306,7 @@ public class StandardContext extends ContainerBase
      */
     protected String getBasePath() {
         String docBase = null;
+        // host
         Container container = this;
         while (container != null) {
             if (container instanceof Host)

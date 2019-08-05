@@ -49,12 +49,14 @@ public abstract class LifecycleMBeanBase extends LifecycleBase
      * Sub-classes wishing to perform additional initialization should override
      * this method, ensuring that super.initInternal() is the first call in the
      * overriding method.
+     *
+     * <br><br>
+     * 子类如果需要额外的初始化操作可以覆盖这个方法，确保在覆盖方法中先调用super.initInternal()。
      */
     @Override
     protected void initInternal() throws LifecycleException {
         
-        // If oname is not null then registration has already happened via
-        // preRegister().
+        // If oname is not null then registration has already happened via preRegister().
         if (oname == null) {
             mserver = Registry.getRegistry(null, null).getMBeanServer();
             

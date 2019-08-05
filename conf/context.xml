@@ -16,7 +16,8 @@
   limitations under the License.
 -->
 <!-- The contents of this file will be loaded for each web application -->
-<Context>
+<!-- 打印web应用的web.xml文件日志：logEffectiveWebXml="true" -->
+<Context logEffectiveWebXml="false">
 
     <!-- Default set of monitored resources -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>

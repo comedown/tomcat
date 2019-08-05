@@ -115,12 +115,14 @@ public class SetNextRule extends Rule {
 
     /**
      * The method name to call on the parent object.
+     * <p>父级对象的方法命名，用来调用设置属性。
      */
     protected String methodName = null;
 
 
     /**
      * The Java class name of the parameter type expected by the method.
+     * <p>被调用方法的参数类型。
      */
     protected String paramType = null;
 

@@ -84,6 +84,7 @@ public class CatalinaProperties {
 
     /**
      * Load properties.
+     * catalina.config > home/conf/catalina.properties > /org/apache/catalina/startup/catalina.properties
      */
     private static void loadProperties() {
 
@@ -91,6 +92,7 @@ public class CatalinaProperties {
         Throwable error = null;
 
         try {
+            // 先读取系统属性catalina.config的路径
             String configUrl = getConfigUrl();
             if (configUrl != null) {
                 is = (new URL(configUrl)).openStream();
@@ -101,8 +103,11 @@ public class CatalinaProperties {
 
         if (is == null) {
             try {
+                // catalina.base > catalina.home > user.dir
                 File home = new File(getCatalinaBase());
+                // home/confg
                 File conf = new File(home, "conf");
+                // home/conf/catalina.properties
                 File propsFile = new File(conf, "catalina.properties");
                 is = new FileInputStream(propsFile);
             } catch (Throwable t) {

@@ -32,6 +32,7 @@ public final class SecurityClassLoad {
         throws Exception {
 
         // 通过系统变量开启SecurityManager。-Djava.security.manager
+        // -Djava.security.policy="E:/java.policy"  指定配置文件位置
         if( System.getSecurityManager() == null ){
             return;
         }

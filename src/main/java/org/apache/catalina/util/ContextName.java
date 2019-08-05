@@ -27,7 +27,9 @@ public final class ContextName {
     private static final String VERSION_MARKER = "##";
     private static final String FWD_SLASH_REPLACEMENT = "#";
 
+    /**  */
     private final String baseName;
+    /**  */
     private final String path;
     private final String version;
     private final String name;
@@ -75,6 +77,7 @@ public final class ContextName {
         }
 
         // Remove any file extensions
+        // 删除文件扩展名，只处理war、xml文件
         if (stripFileExtension &&
                 (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
                         tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml"))) {

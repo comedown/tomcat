@@ -286,6 +286,7 @@ public class WebXml {
     // TODO: icon (multiple) is ignored
     // TODO: init-param/description (multiple with language) is ignored
     // TODO: security-role-ref/description (multiple with language) is ignored
+    /** servlet映射：servlet名称 -> servlet定义信息 */
     private Map<String,ServletDef> servlets = new HashMap<String,ServletDef>();
     public void addServlet(ServletDef servletDef) {
         servlets.put(servletDef.getServletName(), servletDef);
@@ -1347,6 +1348,7 @@ public class WebXml {
         for (ErrorPage errorPage : errorPages.values()) {
             context.addErrorPage(errorPage);
         }
+        // 过滤器
         for (FilterDef filter : filters.values()) {
             if (filter.getAsyncSupported() == null) {
                 filter.setAsyncSupported("false");
@@ -1362,6 +1364,7 @@ public class WebXml {
             context.getJspConfigDescriptor().getJspPropertyGroups().add(
                     descriptor);
         }
+        // 监听器
         for (String listener : listeners) {
             context.addApplicationListener(listener);
         }
@@ -1399,7 +1402,9 @@ public class WebXml {
         for (ContextService service : serviceRefs.values()) {
             context.getNamingResources().addService(service);
         }
+        // servlet
         for (ServletDef servlet : servlets.values()) {
+            // 创建Wrapper，一个servlet对应一个wrapper
             Wrapper wrapper = context.createWrapper();
             // Description is ignored
             // Display name is ignored
@@ -1413,6 +1418,7 @@ public class WebXml {
             if (servlet.getEnabled() != null) {
                 wrapper.setEnabled(servlet.getEnabled().booleanValue());
             }
+            // 设置Wrapper容器名称。
             wrapper.setName(servlet.getServletName());
             Map<String,String> params = servlet.getParameterMap();
             for (Entry<String, String> entry : params.entrySet()) {
@@ -1424,6 +1430,7 @@ public class WebXml {
                 wrapper.addSecurityReference(
                         roleRef.getName(), roleRef.getLink());
             }
+            // 设置Wrapper容器Servlet类名
             wrapper.setServletClass(servlet.getServletClass());
             MultipartDef multipartdef = servlet.getMultipartDef();
             if (multipartdef != null) {
@@ -1446,8 +1453,10 @@ public class WebXml {
                         servlet.getAsyncSupported().booleanValue());
             }
             wrapper.setOverridable(servlet.isOverridable());
+            // 加入Context，并启动Wrapper
             context.addChild(wrapper);
         }
+        // servlet-mapping 加入context
         for (Entry<String, String> entry : servletMappings.entrySet()) {
             context.addServletMapping(entry.getKey(), entry.getValue());
         }

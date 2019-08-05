@@ -48,6 +48,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     /**
      * State.
+     * <p>是否解析过请求头
      */
     protected boolean parsingHeader;
 

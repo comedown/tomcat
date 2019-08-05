@@ -97,6 +97,7 @@ public class StandardHost extends ContainerBase implements Host {
     /**
      * The Java class name of the default context configuration class
      * for deployed web applications.
+     * <p>Context配置、监听类
      */
     private String configClass =
         "org.apache.catalina.startup.ContextConfig";

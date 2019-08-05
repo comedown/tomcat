@@ -60,7 +60,9 @@ public class WebappServiceLoader<T> {
     private static final String SERVICES = "META-INF/services/";
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
+    /** Context容器 */
     private final Context context;
+    /** Servlet上下文 */
     private final ServletContext servletContext;
     private final Pattern containerSciFilterPattern;
 
@@ -88,6 +90,7 @@ public class WebappServiceLoader<T> {
      * @throws IOException if there was a problem loading any service
      */
     public List<T> load(Class<T> serviceType) throws IOException {
+        // META-INF/services/<serviceType name>
         String configFile = SERVICES + serviceType.getName();
 
         LinkedHashSet<String> applicationServicesFound = new LinkedHashSet<String>();

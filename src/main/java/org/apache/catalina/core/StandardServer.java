@@ -77,6 +77,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.setContainer(this);
 
         if (isUseNaming()) {
+            // 添加命名监听器
             namingContextListener = new NamingContextListener();
             addLifecycleListener(namingContextListener);
         }
@@ -114,11 +115,13 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     /**
      * The port number on which we wait for shutdown commands.
+     * <p>等待关闭命令的默认端口：8005。
      */
     private int port = 8005;
 
     /**
      * The address on which we wait for shutdown commands.
+     * <p>等待关闭命令的默认地址：localhost。
      */
     private String address = "localhost";
 
@@ -139,6 +142,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     /**
      * The shutdown command string we are looking for.
+     * <p>默认关闭命令：SHUTDOWN。
      */
     private String shutdown = "SHUTDOWN";
 
@@ -168,6 +172,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     /**
      * Server socket that is used to wait for the shutdown command.
+     * <p>等待关闭命令的ServerSocket。
      */
     private volatile ServerSocket awaitSocket = null;
 
@@ -415,6 +420,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Wait until a proper shutdown command is received, then return.
      * This keeps the main thread alive - the thread pool listening for http 
      * connections is daemon threads.
+     *
+     * <p>线程等待返回，直到收到正确的关闭命令。这个方法使main线程存活-由线程池中守护线程
+     * 监听http连接请求。
      */
     @Override
     public void await() {
@@ -440,6 +448,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         }
 
         // Set up a server socket to wait on
+        // 新建一个ServerSocket等待关闭命令。
         try {
             awaitSocket = new ServerSocket(port, 1,
                     InetAddress.getByName(address));
@@ -468,6 +477,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     long acceptStartTime = System.currentTimeMillis();
                     try {
                         socket = serverSocket.accept();
+                        // 读取流超时时间
                         socket.setSoTimeout(10 * 1000);  // Ten seconds
                         stream = socket.getInputStream();
                     } catch (SocketTimeoutException ste) {
@@ -726,6 +736,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Return true if naming should be used.
      */
     private boolean isUseNaming() {
+        // 默认true
         boolean useNaming = true;
         // Reading the "catalina.useNaming" environment variable
         String useNamingProperty = System.getProperty("catalina.useNaming");
@@ -746,13 +757,16 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     protected void startInternal() throws LifecycleException {
-
+        // 配置启动事件
         fireLifecycleEvent(CONFIGURE_START_EVENT, null);
+        // 设置server状态为启动中
         setState(LifecycleState.STARTING);
 
+        // 启动命名资源
         globalNamingResources.start();
         
         // Start our defined Services
+        // 启动service
         synchronized (servicesLock) {
             for (int i = 0; i < services.length; i++) {
                 services[i].start();

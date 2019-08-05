@@ -97,6 +97,8 @@ public class HostConfig
 
     /**
      * App base.
+     * <br><br>
+     * web应用存在的路径。
      */
     protected File appBase = null;
 
@@ -164,6 +166,7 @@ public class HostConfig
 
     /**
      * Map of deployed applications.
+     * <p>已经发布的web应用。
      */
     protected Map<String, DeployedApplication> deployed =
         new ConcurrentHashMap<String, DeployedApplication>();
@@ -519,7 +522,9 @@ public class HostConfig
      */
     protected void deployApps() {
 
+        // ${catalina.home}/webapps
         File appBase = appBase();
+        // ${catalina.home}/conf/
         File configBase = configBase();
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         // Deploy XML descriptors from configBase
@@ -815,6 +820,7 @@ public class HostConfig
             if (files[i].equalsIgnoreCase("WEB-INF"))
                 continue;
             File war = new File(appBase, files[i]);
+            // 解析war包
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") &&
                     war.isFile() && !invalidWars.contains(files[i]) ) {
 
@@ -856,6 +862,7 @@ public class HostConfig
                     continue;
                 }
 
+                // 异步发布war包
                 results.add(es.submit(new DeployWar(this, cn, war)));
             }
         }
@@ -922,6 +929,7 @@ public class HostConfig
         File xml = new File(appBase(),
                 cn.getBaseName() + "/META-INF/context.xml");
 
+        // jar包中是否包含context.xml文件
         boolean xmlInWar = false;
         try {
             jar = new JarFile(war);
@@ -1124,6 +1132,7 @@ public class HostConfig
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
             context.setDocBase(cn.getBaseName() + ".war");
+            // host增加context子容器，并启动context
             host.addChild(context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -1728,6 +1737,7 @@ public class HostConfig
             log.debug(sm.getString("hostConfig.start"));
 
         try {
+            // 注册MBean
             ObjectName hostON = host.getObjectName();
             oname = new ObjectName
                 (hostON.getDomain() + ":type=Deployer,host=" + host.getName());
@@ -1737,6 +1747,7 @@ public class HostConfig
             log.warn(sm.getString("hostConfig.jmx.register", oname), e);
         }
 
+        // 如果appBase不是一个目录
         if (!appBase().isDirectory()) {
             log.error(sm.getString(
                     "hostConfig.appBase", host.getName(), appBase().getPath()));
@@ -1744,6 +1755,7 @@ public class HostConfig
             host.setAutoDeploy(false);
         }
 
+        // 发布web应用
         if (host.getDeployOnStartup())
             deployApps();
 

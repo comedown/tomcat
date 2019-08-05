@@ -101,6 +101,7 @@ public class ObjectCreateRule extends Rule {
 
     /**
      * The Java class name of the object to be created.
+     * <p>用来创建实例的类全路径名
      */
     protected String className = null;
 
@@ -143,6 +144,7 @@ public class ObjectCreateRule extends Rule {
         // Instantiate the new object and push it on the context stack
         Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
         Object instance = clazz.newInstance();
+        // 当前对象入栈顶
         digester.push(instance);
     }
 

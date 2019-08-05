@@ -91,6 +91,7 @@ public final class Bootstrap {
                 // no config file, default to this loader - we might be in a 'single' env.
                 commonLoader=this.getClass().getClassLoader();
             }
+            // 如果未配置加载路径，取commonLoader作为catalinaLoader、sharedLoader
             catalinaLoader = createClassLoader("server", commonLoader);
             sharedLoader = createClassLoader("shared", commonLoader);
         } catch (Throwable t) {
@@ -133,6 +134,10 @@ public final class Bootstrap {
             }
 
             // Local repository
+            // Examples:
+            //     "foo": Add this folder as a class repository
+            //     "foo/*.jar": Add all the JARs of the specified folder as class repositories
+            //     "foo/bar.jar": Add bar.jar as a class repository
             if (repository.endsWith("*.jar")) {
                 repository = repository.substring
                     (0, repository.length() - "*.jar".length());
@@ -227,10 +232,12 @@ public final class Bootstrap {
         // Set the shared extensions class loader
         if (log.isDebugEnabled())
             log.debug("Setting startup class properties");
+        // 设置parent类加载器
         String methodName = "setParentClassLoader";
         Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
         Object paramValues[] = new Object[1];
+        // 参数为sharedLoader
         paramValues[0] = sharedLoader;
         // Catalina类不在classpath下，不能直接调用
         Method method =
@@ -483,12 +490,14 @@ public final class Bootstrap {
      * working directory if it has not been set.
      */
     private void setCatalinaBase() {
-
+        // 系统已配置catalina.base
         if (System.getProperty(Globals.CATALINA_BASE_PROP) != null)
             return;
+        // 如果catalina.base为空，catalina.home不为空，则取catalina.home作为catalina.base
         if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
             System.setProperty(Globals.CATALINA_BASE_PROP,
                                System.getProperty(Globals.CATALINA_HOME_PROP));
+        // 取项目根目录作为catalina.base
         else
             System.setProperty(Globals.CATALINA_BASE_PROP,
                                System.getProperty("user.dir"));
@@ -502,10 +511,9 @@ public final class Bootstrap {
      *
      * <br><br>
      * 如果当前工作目录还未设置系统属性<code>catalina.home</code>，则设置它。
-     *
      */
     private void setCatalinaHome() {
-        // 如果设置了，直接返回
+        // 系统属性中已配置catalina.home
         if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
             return;
         // 获取bootstrap.jar，user.dir表示项目根目录
@@ -522,7 +530,9 @@ public final class Bootstrap {
                 System.setProperty(Globals.CATALINA_HOME_PROP,
                                    System.getProperty("user.dir"));
             }
-        } else { // 如果不存在bootstrap.jar，则设置Catalina.home为用户目录
+        }
+        // 如果不存在bootstrap.jar，则设置Catalina.home为用户目录
+        else {
             System.setProperty(Globals.CATALINA_HOME_PROP,
                                System.getProperty("user.dir"));
         }

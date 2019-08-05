@@ -302,6 +302,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         this.parent = p;
 
+        // 获取扩展类加载器
         ClassLoader j = String.class.getClassLoader();
         if (j == null) {
             j = getSystemClassLoader();
@@ -1865,6 +1866,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
             // (0.2) Try loading the class with the system class loader, to prevent
             //       the webapp from overriding J2SE classes
+            // 先用系统类加载器加载，防止web应用覆盖J2SE的类。
             try {
                 clazz = j2seClassLoader.loadClass(name);
                 if (clazz != null) {

@@ -101,6 +101,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * The Container associated with this Service. (In the case of the
      * org.apache.catalina.startup.Embedded subclass, this holds the most
      * recently added Engine.)
+     * <p>除了嵌套子类，大部分情况是Engine容器。
      */
     protected Container container = null;
 
@@ -439,6 +440,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         setState(LifecycleState.STARTING);
 
         // Start our defined Container first
+        // 启动Engine
         if (container != null) {
             synchronized (container) {
                 container.start();
@@ -540,7 +542,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
-        
+
+        // 初始化container
         if (container != null) {
             container.init();
         }

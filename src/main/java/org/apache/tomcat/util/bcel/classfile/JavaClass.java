@@ -28,6 +28,7 @@ package org.apache.tomcat.util.bcel.classfile;
 public class JavaClass {
 
     private final int access_flags;
+    /** 全路径名 */
     private final String class_name;
     private final String superclass_name;
     private final String[] interface_names;

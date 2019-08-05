@@ -445,7 +445,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     getHandler().getGlobal(), rgOname, null );
         }
 
+        // 设置连接点名称
         String endpointName = getName();
+        // 去掉双引号
         endpoint.setName(endpointName.substring(1, endpointName.length()-1));
 
         try {

@@ -22,7 +22,9 @@ package org.apache.catalina.deploy;
  */
 public class ApplicationListener {
 
+    /** 监听器名称 */
     private final String className;
+    /** true：不可插拔，false：可插拔 */
     private final boolean pluggabilityBlocked;
 
     public ApplicationListener(String className,

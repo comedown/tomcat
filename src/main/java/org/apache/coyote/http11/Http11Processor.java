@@ -131,7 +131,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
                 && (threadsBusy = endpoint.getCurrentThreadsBusy()) > 0) {
             threadRatio = (threadsBusy * 100) / maxThreads;
         }
-        // Disable keep-alive if we are running low on threads      
+        // Disable keep-alive if we are running low on threads
+        // 超过百分之**后，设置为短连接
         if (threadRatio > getDisableKeepAlivePercentage()) {     
             return true;
         }

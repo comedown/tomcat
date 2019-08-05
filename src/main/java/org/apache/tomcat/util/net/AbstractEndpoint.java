@@ -119,6 +119,7 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Are we using an internal executor
+     * <p>是否使用内部实现的线程池
      */
     protected volatile boolean internalExecutor = true;
 
@@ -181,6 +182,7 @@ public abstract class AbstractEndpoint<S> {
     public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
 
 
+    /** 默认为最大工作线程数 -> maxThreads */
     private int maxConnections = 10000;
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
@@ -223,8 +225,10 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * External Executor based thread pool.
+     * <p>基于java线程池的外部执行器。
      */
     private Executor executor = null;
+    /** 设置外部实现的线程池 */
     public void setExecutor(Executor executor) {
         this.executor = executor;
         this.internalExecutor = (executor==null);
@@ -341,6 +345,7 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Maximum amount of worker threads.
+     * <p>最大工作线程数。
      */
     private int maxThreads = 200;
     public void setMaxThreads(int maxThreads) {
@@ -541,6 +546,7 @@ public abstract class AbstractEndpoint<S> {
     }
 
 
+    /** 创建执行socket处理逻辑的工作线程 */
     public void createExecutor() {
         internalExecutor = true;
         TaskQueue taskqueue = new TaskQueue();
@@ -748,6 +754,7 @@ public abstract class AbstractEndpoint<S> {
         startInternal();
     }
 
+    /** 开启socket连接线程 */
     protected final void startAcceptorThreads() {
         int count = getAcceptorThreadCount();
         acceptors = new Acceptor[count];

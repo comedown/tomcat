@@ -207,6 +207,9 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * Coyote Protocol handler class name.
      * Defaults to the Coyote HTTP/1.1 protocolHandler.
+     *
+     * <br><br>
+     * 网络协议处理器类名。默认使用HTTP/1.1网络协议处理器。
      */
     protected String protocolHandlerClassName =
             "org.apache.coyote.http11.Http11Protocol";
@@ -238,6 +241,7 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * URI encoding.
+     * <p>&lt;Connector "URIEncoding"="***" /&gt;</p>
      */
     protected String URIEncoding = null;
 

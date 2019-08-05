@@ -95,6 +95,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         // Skipping blank lines
         //
 
+        // 跳过空格
         byte chr = 0;
         do {
 
@@ -121,6 +122,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         // Method name is a token
         //
 
+        // 读取method name，即：get、post...
         boolean space = false;
 
         while (!space) {
@@ -133,8 +135,10 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Spec says method name is a token followed by a single SP but
             // also be tolerant of multiple SP and/or HT.
+            // 当遇到空格、制表符时，表示method name执行完毕
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
+                // 保存method
                 request.method().setBytes(buf, start, pos - start);
             } else if (!HttpParser.isToken(buf[pos])) {
                 throw new IllegalArgumentException(sm.getString("iib.invalidmethod"));
@@ -145,6 +149,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         }
 
         // Spec says single SP but also be tolerant of multiple SP and/or HT
+        // 跳过空格
         while (space) {
             // Read new bytes if needed
             if (pos >= lastValid) {
@@ -167,6 +172,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         // Reading the URI
         //
 
+        // 读取URI，即：请求路径
         boolean eol = false;
 
         while (!space) {
@@ -184,10 +190,13 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             } else if ((buf[pos] == Constants.CR)
                        || (buf[pos] == Constants.LF)) {
                 // HTTP/0.9 style request
+                // 兼容HTTP/0.9风格的请求
                 eol = true;
                 space = true;
                 end = pos;
-            } else if ((buf[pos] == Constants.QUESTION) && (questionPos == -1)) {
+            }
+            // 记录请求参数标志，即：get请求时，?所在的位置
+            else if ((buf[pos] == Constants.QUESTION) && (questionPos == -1)) {
                 questionPos = pos;
             } else if (questionPos != -1 && !httpParser.isQueryRelaxed(buf[pos])) {
                 // %nn decoding will be checked at the point of decoding
@@ -203,16 +212,21 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
         }
 
+        // 保存为解析的URI，即：包含参数的URI
         request.unparsedURI().setBytes(buf, start, end - start);
+        // 如果包含参数标志：?，解析URI路径和参数
         if (questionPos >= 0) {
+            // 保存参数
             request.queryString().setBytes(buf, questionPos + 1,
                                            end - questionPos - 1);
+            // 保存解析后的URI
             request.requestURI().setBytes(buf, start, questionPos - start);
         } else {
             request.requestURI().setBytes(buf, start, end - start);
         }
 
         // Spec says single SP but also says be tolerant of multiple SP and/or HT
+        // 跳过空格
         while (space) {
             // Read new bytes if needed
             if (pos >= lastValid) {
@@ -234,6 +248,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         // Reading the protocol
         // Protocol is always "HTTP/" DIGIT "." DIGIT
         //
+        // 读取协议版本，即：HTTP/1.1
         while (!eol) {
 
             // Read new bytes if needed
@@ -256,6 +271,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
         }
 
+        // 保存请求协议版本
         if ((end - start) > 0) {
             request.protocol().setBytes(buf, start, end - start);
         } else {
@@ -278,6 +294,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                     sm.getString("iib.parseheaders.ise.error"));
         }
 
+        // 每循环一次解析一行请求头
         while (parseHeader()) {
             // Loop until we run out of headers
         }
@@ -302,6 +319,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         // Check for blank line
         //
 
+        // 跳过空白行
         byte chr = 0;
         while (true) {
 
@@ -334,6 +352,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         // Header name is always US-ASCII
         //
 
+        // 读取请求头名称
         boolean colon = false;
         MessageBytes headerValue = null;
 
@@ -345,8 +364,10 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
+            // 读到冒号，请求头名称结束
             if (buf[pos] == Constants.COLON) {
                 colon = true;
+                // 保存请求头名称
                 headerValue = headers.addValue(buf, start, pos - start);
             } else if (!HttpParser.isToken(buf[pos])) {
                 // Non-token characters are illegal in header names
@@ -373,6 +394,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         // Reading the header value (which can be spanned over multiple lines)
         //
 
+        // 读取请求头值，可能跨多行
         boolean eol = false;
         boolean validLine = true;
 
@@ -381,6 +403,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             boolean space = true;
 
             // Skipping spaces
+            // 跳过空白字符
             while (space) {
 
                 // Read new bytes if needed

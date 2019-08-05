@@ -136,6 +136,7 @@ public class FilterDef implements Serializable {
     /**
      * The set of initialization parameters for this filter, keyed by
      * parameter name.
+     * <p>init-param, name -> value
      */
     private Map<String, String> parameters = new HashMap<String, String>();
 

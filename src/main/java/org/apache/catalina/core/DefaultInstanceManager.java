@@ -101,7 +101,9 @@ public class DefaultInstanceManager implements InstanceManager {
 
     private final Context context;
     private final Map<String, Map<String, String>> injectionMap;
+    /** web应用类加载器：WebAppClassLoader */
     protected final ClassLoader classLoader;
+    /** 容器类加载器：SharedClassLoader */
     protected final ClassLoader containerClassLoader;
     protected boolean privileged;
     protected boolean ignoreAnnotations;

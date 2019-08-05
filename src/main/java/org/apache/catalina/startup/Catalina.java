@@ -95,6 +95,8 @@ public class Catalina {
     // XXX Should be moved to embedded
     /**
      * The shared extensions class loader for this server.
+     * <p>取Catalina的类加载器，在Tomcat的中是ShareClassLoader，
+     * 在编译器里面是AppClassLoader
      */
     protected ClassLoader parentClassLoader =
         Catalina.class.getClassLoader();
@@ -307,7 +309,6 @@ public class Catalina {
      *
      * <br><br>
      * 解析server.xml
-     *
      */
     protected Digester createStartDigester() {
         long t1=System.currentTimeMillis();
@@ -753,6 +754,7 @@ public class Catalina {
             }
         }
 
+        // 设置主线程等待关闭
         if (await) {
             await();
             stop();

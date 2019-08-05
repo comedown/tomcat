@@ -33,6 +33,8 @@ package org.apache.tomcat.util.digester;
  * <li>Digester will call the <code>addRuleInstances()</code> method of
  *     your RuleSet to configure the necessary rules.</li>
  * </ul>
+ *
+ * <p>加入一系列rule
  */
 
 public interface RuleSet {

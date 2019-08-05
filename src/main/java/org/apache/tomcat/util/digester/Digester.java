@@ -77,6 +77,8 @@ import org.xml.sax.helpers.AttributesImpl;
  * this class working with XML schema</p>
  *
  * <p>在tomcat-coyote.jar里面</p>
+ * <p>Digester.parse(source) -> 根据xmlPath获取Rule集合 -> 按照注册顺序调用Rule的begin()
+ * -> 将当前对象压栈
  *
  */
 public class Digester extends DefaultHandler2 {
@@ -308,6 +310,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * The "root" element of the stack (in other words, the last object
      * that was popped.
+     * <p>栈的根节点，换句话说，最后一个出栈的对象。
      */
     protected Object root = null;
 
@@ -329,6 +332,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * Do we want to use the Context ClassLoader when loading classes
      * for instantiating new objects.  Default is <code>false</code>.
+     * <p>是否使用Context类加载器加载类。默认：false。
      */
     protected boolean useContextClassLoader = false;
 
@@ -1277,6 +1281,7 @@ public class Digester extends DefaultHandler2 {
 
         // the actual element name is either in localName or qName, depending
         // on whether the parser is namespace aware
+        // 节点名称
         String name = localName;
         if ((name == null) || (name.length() < 1)) {
             name = qName;
@@ -1294,6 +1299,7 @@ public class Digester extends DefaultHandler2 {
         }
 
         // Fire "begin" events for all relevant rules
+        // 查询符合匹配模式的rule，循环调用begin()
         List<Rule> rules = getRules().match(namespaceURI, match);
         matches.push(rules);
         if ((rules != null) && (rules.size() > 0)) {
@@ -2779,6 +2785,7 @@ public class Digester extends DefaultHandler2 {
      * Returns an attributes list which contains all the attributes
      * passed in, with any text of form "${xxx}" in an attribute value
      * replaced by the appropriate value from the system property.
+     * <p>解析属性集，用系统属性替换掉${xxx}。
      */
     private Attributes updateAttributes(Attributes list) {
 

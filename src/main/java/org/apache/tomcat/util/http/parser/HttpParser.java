@@ -102,11 +102,12 @@ public class HttpParser {
 
         for (int i = 0; i < ARRAY_SIZE; i++) {
             // Control> 0-31, 127
+            // 小于32或等于127的字符为ASCII控制字符
             if (i < 32 || i == 127) {
                 IS_CONTROL[i] = true;
             }
 
-            // Separator
+            // Separator  分隔字符
             if (    i == '(' || i == ')' || i == '<' || i == '>'  || i == '@'  ||
                     i == ',' || i == ';' || i == ':' || i == '\\' || i == '\"' ||
                     i == '/' || i == '[' || i == ']' || i == '?'  || i == '='  ||
@@ -115,11 +116,13 @@ public class HttpParser {
             }
 
             // Token: Anything 0-127 that is not a control and not a separator
+            // 任何小于128，且不是control和separator的字符
             if (!IS_CONTROL[i] && !IS_SEPARATOR[i] && i < 128) {
                 IS_TOKEN[i] = true;
             }
 
             // Hex: 0-9, a-f, A-F
+            // 16进制字符
             if ((i >= '0' && i <='9') || (i >= 'a' && i <= 'f') || (i >= 'A' && i <= 'F')) {
                 IS_HEX[i] = true;
             }
@@ -440,6 +443,7 @@ public class HttpParser {
     }
 
 
+    /** 判断c是否HTTP协议中的字符 */
     public static boolean isHttpProtocol(int c) {
         // Fast for valid HTTP protocol characters, slower for some incorrect
         // ones

@@ -53,6 +53,7 @@ import org.xml.sax.SAXException;
 /**
  * Startup event listener for a <b>Context</b> that configures application
  * listeners configured in any TLD files.
+ * <p>Context启动配置应用程序监听事件，用于解析TLD文件。自定义标签配置。
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
@@ -155,6 +156,7 @@ public final class TldConfig  implements LifecycleListener {
 
     /**
      * The Context we are associated with.
+     * <p>关联的Context容器。
      */
     private Context context = null;
 
@@ -387,6 +389,8 @@ public final class TldConfig  implements LifecycleListener {
      * JSP 2.0 spec.
      * 
      * Keep in sync with o.a.j.comiler.TldLocationsCache
+     *
+     * <p>查找/WEB-INF/下面所有tld文件
      */
     private void tldScanResourcePaths(String startPath) {
 

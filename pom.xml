@@ -65,10 +65,10 @@
  
     <build>
         <finalName>Tomcat7.x</finalName>
-        <sourceDirectory>java</sourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
             <resource>
-                <directory>java</directory>
+                <directory>src/main/java</directory>
             </resource>
         </resources>
         <plugins>

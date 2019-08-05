@@ -974,6 +974,7 @@ public class CoyoteAdapter implements Adapter {
         // What encoding to use? Some platforms, eg z/os, use a default
         // encoding that doesn't give the expected result so be explicit
         String enc = connector.getURIEncoding();
+        // 默认使用ISO-8859-1
         if (enc == null) {
             enc = "ISO-8859-1";
         }

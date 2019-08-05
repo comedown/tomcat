@@ -145,6 +145,7 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Flag that indicates if this instance has been initialized
+     * <p>是否调用过init方法
      */
     protected volatile boolean instanceInitialized = false;
 

@@ -575,6 +575,7 @@ public class WebappLoader extends LifecycleMBeanBase
         }
 
         // Register a stream handler factory for the JNDI protocol
+        // 自定义url协议
         URLStreamHandlerFactory streamHandlerFactory =
                 DirContextURLStreamHandlerFactory.getInstance();
         if (first) {
@@ -594,7 +595,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
         // Construct a class loader based on our current repositories list
         try {
-
+            // 创建应用上下文类加载器
             classLoader = createClassLoader();
             classLoader.setJarOpenInterval(this.jarOpenInterval);
             classLoader.setResources(container.getResources());

@@ -138,6 +138,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
     /**
      * Async timeout thread
+     * <p>处理超时的socket的守护线程。
      */
     protected class AsyncTimeout implements Runnable {
         /**
@@ -214,12 +215,12 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
                 try {
                     //if we have reached max connections, wait
+                    // 连接数达到最大，则多余连接在此等待
                     countUpOrAwaitConnection();
 
                     Socket socket = null;
                     try {
-                        // Accept the next incoming connection from the server
-                        // socket
+                        // Accept the next incoming connection from the server socket
                         socket = serverSocketFactory.acceptSocket(serverSocket);
                     } catch (IOException ioe) {
                         countDownConnection();
@@ -229,6 +230,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                         throw ioe;
                     }
                     // Successful accept, reset the error delay
+                    // 成功获取连接，重置错误位
                     errorDelay = 0;
 
                     // Configure the socket
@@ -381,6 +383,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             acceptorThreadCount = 1;
         }
         // Initialize maxConnections
+        // 初始化最大连接数
         if (getMaxConnections() == 0) {
             // User hasn't set a value - use the default
             setMaxConnections(getMaxThreadsWithExecutor());
@@ -431,6 +434,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                 createExecutor();
             }
 
+            // 初始化连接插销
             initializeConnectionLatch();
 
             startAcceptorThreads();

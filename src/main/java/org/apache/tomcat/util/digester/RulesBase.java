@@ -52,6 +52,7 @@ public class RulesBase implements Rules {
      * The set of registered Rule instances, keyed by the matching pattern.
      * Each value is a List containing the Rules for that pattern, in the
      * order that they were originally registered.
+     * <p>xmlpath -> rule集合
      */
     protected HashMap<String,List<Rule>> cache =
         new HashMap<String,List<Rule>>();
@@ -74,6 +75,7 @@ public class RulesBase implements Rules {
     /**
      * The set of registered Rule instances, in the order that they were
      * originally registered.
+     * <p>rule实例集合，按照注册顺序排列。
      */
     protected ArrayList<Rule> rules = new ArrayList<Rule>();
 
@@ -102,6 +104,7 @@ public class RulesBase implements Rules {
     public void setDigester(Digester digester) {
 
         this.digester = digester;
+        // 设置每个rule的digester
         Iterator<Rule> items = rules.iterator();
         while (items.hasNext()) {
             Rule item = items.next();
@@ -153,6 +156,7 @@ public class RulesBase implements Rules {
         // to help users who accidentally add '/' to the end of their patterns
         int patternLength = pattern.length();
         if (patternLength>1 && pattern.endsWith("/")) {
+            // 去掉末尾的 '/'
             pattern = pattern.substring(0, patternLength-1);
         }
         

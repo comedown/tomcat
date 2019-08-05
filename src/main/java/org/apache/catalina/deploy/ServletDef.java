@@ -101,6 +101,7 @@ public class ServletDef implements Serializable {
     /**
      * The name of this servlet, which must be unique among the servlets
      * defined for a particular web application.
+     * <p>servlet名称，对应web.xml中servlet-name
      */
     private String servletName = null;
 
@@ -119,6 +120,7 @@ public class ServletDef implements Serializable {
 
     /**
      * The fully qualified name of the Java class that implements this servlet.
+     * <p>servlet全路径类名，对应web.xml中servlet-class
      */
     private String servletClass = null;
 

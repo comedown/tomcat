@@ -41,6 +41,7 @@ public class SetAllPropertiesRule extends Rule {
     }
 
     // ----------------------------------------------------- Instance Variables
+    /** 设置属性时，排除的字段 */
     protected HashMap<String,String> excludes = new HashMap<String,String>();
 
     // --------------------------------------------------------- Public Methods

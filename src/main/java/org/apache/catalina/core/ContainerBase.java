@@ -129,6 +129,8 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * TODO: Review synchronisation around background processing. See bug 47024.
  *
+ * <p>容器抽象类。Engine -> Host -> Context -> Wrapper。
+ *
  * @author Craig R. McClanahan
  */
 public abstract class ContainerBase extends LifecycleMBeanBase
@@ -221,6 +223,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     /**
      * The human-readable name of this Container.
+     * <p>容器名称。
      */
     protected String name = null;
 
@@ -270,6 +273,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     /**
      * Will children be started automatically when they are added.
+     * <p>加入子容器时是否自动启动。
      */
     protected boolean startChildren = true;
 
@@ -995,6 +999,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
     }
 
+    /** 容器加入子容器，并且启动 */
     private void addChildInternal(Container child) {
 
         if( log.isDebugEnabled() )
@@ -1190,6 +1195,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     protected void initInternal() throws LifecycleException {
         BlockingQueue<Runnable> startStopQueue =
             new LinkedBlockingQueue<Runnable>();
+        // 固定大小线程池
         startStopExecutor = new ThreadPoolExecutor(
                 getStartStopThreadsInternal(),
                 getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
@@ -1230,6 +1236,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             ((Lifecycle) resources).start();
 
         // Start our child containers, if any
+        // 异步执行子容器的启动操作
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<Future<Void>>();
         for (int i = 0; i < children.length; i++) {
@@ -1238,6 +1245,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         MultiThrowable multiThrowable = null;
 
+        // 校验子线程是否执行成功
         for (Future<Void> result : results) {
             try {
                 result.get();
@@ -1585,6 +1593,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Start the background thread that will periodically check for
      * session timeouts.
+     * <p>启动后台守护线程，定期检查session过期。
      */
     protected void threadStart() {
 
@@ -1693,7 +1702,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
 
     // ----------------------------- Inner classes used with start/stop Executor
-
+    /** 启动子容器线程 */
     private static class StartChild implements Callable<Void> {
 
         private Container child;
