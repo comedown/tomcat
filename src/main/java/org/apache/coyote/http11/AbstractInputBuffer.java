@@ -42,6 +42,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     /**
      * Headers of the associated request.
+     * 请求头，和Request是同一个
      */
     protected MimeHeaders headers;
 

@@ -56,6 +56,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             boolean rejectIllegalHeaderName, HttpParser httpParser) {
 
         this.request = request;
+        // 关联请求头
         headers = request.getMimeHeaders();
 
         buf = new byte[headerBufferSize];
@@ -285,6 +286,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     /**
      * Parse the HTTP headers.
+     * <p>解析所有请求头</p>
      */
     @Override
     public boolean parseHeaders()
@@ -307,6 +309,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     /**
      * Parse an HTTP header.
+     * <p>解析单个请求头</p>
      *
      * @return false after reading a blank line (which indicates that the
      * HTTP header parsing is done
@@ -378,6 +381,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             }
 
             chr = buf[pos];
+            // 如果字符为大写，转换成小写
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
                 buf[pos] = (byte) (chr - Constants.LC_OFFSET);
             }
@@ -473,6 +477,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         }
 
         // Set the header value
+        // 保存请求头的值
         headerValue.setBytes(buf, start, realPos - start);
 
         return true;

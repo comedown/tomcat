@@ -85,13 +85,19 @@ public final class Request {
     private int remotePort;
     private int localPort;
 
+    /**  */
     private MessageBytes schemeMB = MessageBytes.newInstance();
 
+    /** 请求方式：GET、POST... */
     private MessageBytes methodMB = MessageBytes.newInstance();
+    /** 带参数的请求路径uri */
     private MessageBytes unparsedURIMB = MessageBytes.newInstance();
+    /** 不带参数的请求路径 */
     private MessageBytes uriMB = MessageBytes.newInstance();
     private MessageBytes decodedUriMB = MessageBytes.newInstance();
+    /** get请求参数 */
     private MessageBytes queryMB = MessageBytes.newInstance();
+    /** 请求协议：HTTP/1.1 */
     private MessageBytes protoMB = MessageBytes.newInstance();
 
     // remote address/host

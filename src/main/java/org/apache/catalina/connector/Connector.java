@@ -963,6 +963,7 @@ public class Connector extends LifecycleMBeanBase  {
         super.initInternal();
 
         // Initialize adapter
+        // 构建网络适配器，用于处理请求
         adapter = new CoyoteAdapter(this);
         protocolHandler.setAdapter(adapter);
 

@@ -318,6 +318,7 @@ public class MimeHeaders {
      * Finds and returns a header field with the given name.  If no such
      * field exists, null is returned.  If more than one such field is
      * in the header, an arbitrary one is returned.
+     * <p>根据请求头名称获取请求头值，忽略大小写</p>
      */
     public MessageBytes getValue(String name) {
         for (int i = 0; i < count; i++) {
@@ -332,6 +333,7 @@ public class MimeHeaders {
      * Finds and returns a unique header field with the given name. If no such
      * field exists, null is returned. If the specified header field is not
      * unique then an {@link IllegalArgumentException} is thrown.
+     * <p>获取请求头为name的唯一的值，如果不存在，返回null，如果存在多个，抛出IllegalArgumentException。</p>
      */
     public MessageBytes getUniqueValue(String name) {
         MessageBytes result = null;
@@ -490,7 +492,9 @@ class MimeHeaderField {
     MimeHeaderField next;
     MimeHeaderField prev;
 
+    /** 请求头名称 */
     protected final MessageBytes nameB = MessageBytes.newInstance();
+    /** 请求头值 */
     protected final MessageBytes valueB = MessageBytes.newInstance();
 
     /**

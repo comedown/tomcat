@@ -1111,7 +1111,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
                 try {
-                    // 解析请求体，即：参数
+                    // 准备请求，校验相关header
                     prepareRequest();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -1281,6 +1281,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (endpoint.isSSLEnabled()) {
             request.scheme().setString("https");
         }
+        // 设置协议类型
         MessageBytes protocolMB = request.protocol();
         if (protocolMB.equals(Constants.HTTP_11)) {
             http11 = true;
@@ -1306,6 +1307,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
         }
 
+        // 设置请求方式
         MessageBytes methodMB = request.method();
         if (methodMB.equals(Constants.GET)) {
             methodMB.setString(Constants.GET);
@@ -1316,9 +1318,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         MimeHeaders headers = request.getMimeHeaders();
 
         // Check connection header
+        // 校验请求头：Connection
         MessageBytes connectionValueMB = headers.getValue(Constants.CONNECTION);
         if (connectionValueMB != null) {
             ByteChunk connectionValueBC = connectionValueMB.getByteChunk();
+            // 如果为Connection:close，keep-alive为false
             if (findBytes(connectionValueBC, Constants.CLOSE_BYTES) != -1) {
                 keepAlive = false;
             } else if (findBytes(connectionValueBC,
@@ -1342,6 +1346,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         // Check user-agent header
+        // 校验User-Agent
         if ((restrictedUserAgents != null) && ((http11) || (keepAlive))) {
             MessageBytes userAgentValueMB = headers.getValue("user-agent");
             // Check in the restricted list, and adjust the http11
@@ -1363,12 +1368,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } catch (IllegalArgumentException iae) {
             // Multiple Host headers are not permitted
             // 400 - Bad request
+            // 多个host信息，返回400
             response.setStatus(400);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("http11processor.request.multipleHosts"));
             }
         }
+        // HTTP/1.1 host不能为空
         if (http11 && hostValueMB == null) {
             // 400 - Bad request
             response.setStatus(400);
@@ -1382,6 +1389,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         // been removed during the parsing of the request line
         ByteChunk uriBC = request.requestURI().getByteChunk();
         byte[] uriB = uriBC.getBytes();
+        // 请求路径如果以http或https开头
         if (uriBC.startsWithIgnoreCase("http", 0)) {
             int pos = 4;
             // Check for https

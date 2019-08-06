@@ -38,6 +38,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     // primary type ( whatever is set as original value )
+    /** msg类型：2=字节、1=字符串、3=字符、0=空，默认为空 */
     private int type = T_NULL;
 
     public static final int T_NULL = 0;
@@ -309,6 +310,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /**
      * Compares the message bytes to the specified String object.
+     * <p>比较是否相等，忽略大小写</p>
      * @param s the String to compare
      * @return true if the comparison succeeded, false otherwise
      */

@@ -700,6 +700,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Copy the raw URI to the decodedURI
+        // URI解码
         MessageBytes decodedURI = req.decodedURI();
         decodedURI.duplicate(req.requestURI());
 
