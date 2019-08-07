@@ -57,6 +57,7 @@ public final class Mapper {
 
     /**
      * Default host name.
+     * <p>Engine指定的默认Host
      */
     String defaultHostName = null;
 
@@ -1420,6 +1421,7 @@ public final class Mapper {
     /**
      * Compare given char chunk with String.
      * Return -1, 0 or +1 if inferior, equal, or superior to the String.
+     * <p>比较给定CharChunk和字符串，分别返回-1，0 或 +1，表示CharChunk小于、等于、大于给定String</p>
      */
     private static final int compare(CharChunk name, int start, int end,
                                      String compareTo) {
@@ -1571,6 +1573,7 @@ public final class Mapper {
     // ------------------------------------------------- MapElement Inner Class
 
 
+    /** 排好序的 */
     protected abstract static class MapElement {
 
         public final String name;

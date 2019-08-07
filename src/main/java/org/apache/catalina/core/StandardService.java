@@ -225,6 +225,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Add a new Connector to the set of defined Connectors, and associate it
      * with this Service's Container.
+     * <p>保存新的Connector，并设置Connector的Service为当前Service；
      *
      * @param connector The Connector to be added
      */

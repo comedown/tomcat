@@ -27,11 +27,13 @@ public final class ContextName {
     private static final String VERSION_MARKER = "##";
     private static final String FWD_SLASH_REPLACEMENT = "#";
 
-    /**  */
+    /** web应用目录名 */
     private final String baseName;
-    /**  */
+    /** 路径：/baseName + version */
     private final String path;
+    /** 版本：用##分隔 */
     private final String version;
+    /** Context容器名称：path + version */
     private final String name;
     
     /**

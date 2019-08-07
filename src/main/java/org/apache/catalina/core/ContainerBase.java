@@ -175,6 +175,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     /**
      * The processor delay for this component.
+     * <p>容器后台守护线程执行时间，即每 ** 秒执行一次</p>
      */
     protected int backgroundProcessorDelay = -1;
 
@@ -291,6 +292,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     /**
      * The background thread completion semaphore.
+     * <p>容器后台守护线程执行信号。</p>
      */
     private volatile boolean threadDone = false;
 
@@ -1464,6 +1466,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Execute a periodic task, such as reloading, etc. This method will be
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
+     * <p>用于执行周期性任务，比如重新加载等。该方法会在当前容器的。意外的异常将会被捕获
+     * 并且记录日志。
      */
     @Override
     public void backgroundProcess() {
@@ -1614,15 +1618,19 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Stop the background thread that is periodically checking for
      * session timeouts.
+     * <p>停止后台守护线程</p>
      */
     protected void threadStop() {
 
         if (thread == null)
             return;
 
+        // 标记线程执行完毕
         threadDone = true;
+        // 中断线程
         thread.interrupt();
         try {
+            // 等待线程执行完毕
             thread.join();
         } catch (InterruptedException e) {
             // Ignore
@@ -1639,6 +1647,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Private thread class to invoke the backgroundProcess method
      * of this container and its children after a fixed delay.
+     * <p>该容器的后台守护线程，负责固定延迟调用容器及其子容器的方法</p>
      */
     protected class ContainerBackgroundProcessor implements Runnable {
 
@@ -1651,6 +1660,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             try {
                 while (!threadDone) {
                     try {
+                        // 每backgroundProcessorDelay执行一次
                         Thread.sleep(backgroundProcessorDelay * 1000L);
                     } catch (InterruptedException e) {
                         // Ignore

@@ -297,9 +297,12 @@ public class WebXml {
     public Map<String,ServletDef> getServlets() { return servlets; }
 
     // servlet-mapping
+    /** 映射路径 -> servlet名称 */
     private Map<String,String> servletMappings = new HashMap<String,String>();
+    /** 所有servlet名称 */
     private Set<String> servletMappingNames = new HashSet<String>();
     public void addServletMapping(String urlPattern, String servletName) {
+        // 如果存在相同映射路径，抛出异常
         String oldServletName = servletMappings.put(urlPattern, servletName);
         if (oldServletName != null) {
             // Duplicate mapping. As per clarification from the Servlet EG,
@@ -1418,8 +1421,9 @@ public class WebXml {
             if (servlet.getEnabled() != null) {
                 wrapper.setEnabled(servlet.getEnabled().booleanValue());
             }
-            // 设置Wrapper容器名称。
+            // 设置Wrapper容器名称为servlet名称
             wrapper.setName(servlet.getServletName());
+            // 设置servlet参数
             Map<String,String> params = servlet.getParameterMap();
             for (Entry<String, String> entry : params.entrySet()) {
                 wrapper.addInitParameter(entry.getKey(), entry.getValue());

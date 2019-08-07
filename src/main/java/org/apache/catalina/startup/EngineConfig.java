@@ -61,6 +61,7 @@ public class EngineConfig
 
     /**
      * Process the START event for an associated Engine.
+     * <p>执行start、stop事件</p>
      *
      * @param event The lifecycle event that has occurred
      */

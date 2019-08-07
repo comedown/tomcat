@@ -188,6 +188,7 @@ public class HostConfig
     /**
      * The list of Wars in the appBase to be ignored because they are invalid
      * (e.g. contain /../ sequences).
+     * <p>无效的war包，包含非法字符序列
      */
     protected Set<String> invalidWars = new HashSet<String>();
 
@@ -1123,6 +1124,7 @@ public class HostConfig
                         Long.valueOf(0));
             }
 
+            // 设置context监听器
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener =
                 (LifecycleListener) clazz.newInstance();
@@ -1361,6 +1363,7 @@ public class HostConfig
 
     /**
      * Check if a webapp is already deployed in this host.
+     * <p>是否发布过</p>
      *
      * @param contextName of the context which will be checked
      */

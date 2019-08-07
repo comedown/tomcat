@@ -105,11 +105,14 @@ public class MapperListener extends LifecycleMBeanBase
         // Find any components that have already been initialized since the
         // MBean listener won't be notified as those components will have
         // already registered their MBeans
+        // 查找并设置默认Host
         findDefaultHost();
 
+        // 容器添加Mapper监听
         Engine engine = (Engine) connector.getService().getContainer();
         addListeners(engine);
 
+        // 添加所有Host
         Container[] conHosts = engine.findChildren();
         for (Container conHost : conHosts) {
             Host host = (Host) conHost;
@@ -258,6 +261,7 @@ public class MapperListener extends LifecycleMBeanBase
 
     // ------------------------------------------------------ Protected Methods
 
+    /** 查找Engine中默认Host对应的Host容器 */
     private void findDefaultHost() {
 
         Engine engine = (Engine) connector.getService().getContainer();
@@ -299,9 +303,11 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private void registerHost(Host host) {
 
+        // 注册Host容器
         String[] aliases = host.findAliases();
         mapper.addHost(host.getName(), aliases, host);
 
+        // 注册Context容器
         for (Container container : host.findChildren()) {
             if (container.getState().isAvailable()) {
                 registerContext((Context) container);

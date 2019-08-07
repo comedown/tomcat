@@ -390,11 +390,14 @@ public class ContextConfig implements LifecycleListener {
 
         // Process the event that has occurred
         if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
+            // configure_start事件
             configureStart();
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
+            // STARTING_PREP状态事件，解压war包，设置Context路径
             beforeStart();
         } else if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
             // Restore docBase for management tools
+            // STARTED状态事件：设置docBase
             if (originalDocBase != null) {
                 context.setDocBase(originalDocBase);
             }
@@ -715,12 +718,14 @@ public class ContextConfig implements LifecycleListener {
             docBase = file.getCanonicalPath();
         }
         file = new File(docBase);
+        // 原始web应用路径
         String origDocBase = docBase;
 
         ContextName cn = new ContextName(context.getPath(),
                 context.getWebappVersion());
         String pathName = cn.getBaseName();
 
+        // 是否解压war包
         boolean unpackWARs = true;
         if (host instanceof StandardHost) {
             unpackWARs = ((StandardHost) host).isUnpackWARs();
@@ -1308,6 +1313,7 @@ public class ContextConfig implements LifecycleListener {
             }
 
             // Step 9. Apply merged web.xml to Context
+            // 应用web.xml中的servlet等，转换为Wrapper添加到Context
             if (ok) {
                 webXml.configureContext(context);
             }

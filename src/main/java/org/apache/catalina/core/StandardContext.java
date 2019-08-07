@@ -373,12 +373,14 @@ public class StandardContext extends ContainerBase
 
     /**
      * Encoded path.
+     * <p>用utf-8编码后的路径
      */
     private String encodedPath = null;
 
 
     /**
      * Unencoded path for this web application.
+     * <p>原始路径</p>
      */
     private String path = null;
 
@@ -416,6 +418,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * The document root for this web application.
+     * <p>BaseName.war</p>
      */
     private String docBase = null;
 
@@ -608,6 +611,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * The session timeout (in minutes) for this web application.
+     * <p>默认session过期时间：30分钟
      */
     private int sessionTimeout = 30;
 
@@ -2340,6 +2344,7 @@ public class StandardContext extends ContainerBase
                     "standardContext.pathInvalid", path, this.path));
         }
         encodedPath = urlEncoder.encode(this.path, "UTF-8");
+        // 如果容器名称为空，以路径作为名称
         if (getName() == null) {
             setName(this.path);
         }

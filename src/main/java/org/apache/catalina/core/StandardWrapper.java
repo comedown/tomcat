@@ -171,6 +171,7 @@ public class StandardWrapper extends ContainerBase
     /**
      * The initialization parameters for this servlet, keyed by
      * parameter name.
+     * <p>servlet参数：name -> value</p>
      */
     protected HashMap<String, String> parameters = new HashMap<String, String>();
 
@@ -195,6 +196,7 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * The fully qualified servlet class name for this servlet.
+     * <p>servlet类全路径名</p>
      */
     protected String servletClass = null;
 

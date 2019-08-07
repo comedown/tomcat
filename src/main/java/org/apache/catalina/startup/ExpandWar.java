@@ -62,6 +62,8 @@ public class ExpandWar {
      * directory structure, and return the absolute pathname to the expanded
      * directory.
      *
+     * <p>解压war包到指定目录，返回绝对路径</p>
+     *
      * @param host Host war is being installed for
      * @param war URL of the web application archive to be expanded
      *  (must start with "jar:")
