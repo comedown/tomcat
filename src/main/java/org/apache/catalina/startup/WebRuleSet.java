@@ -65,12 +65,14 @@ public class WebRuleSet extends RuleSetBase {
     /**
      * The full pattern matching prefix, including the webapp or web-fragment
      * component, to use for matching elements
+     * <p>web-app：web.xml 或者 web-fragment：web-fragment.xml</p>
      */
     protected String fullPrefix = null;
 
     /**
      * Flag that indicates if this ruleset is for a web-fragment.xml file or for
      * a web.xml file.
+     * <p>true:web-fragment.xml   false:web.xml</p>
      */
     protected boolean fragment = false;
 

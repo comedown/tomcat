@@ -602,6 +602,7 @@ public class StandardContext extends ContainerBase
     /**
      * The servlet mappings for this web application, keyed by
      * matching pattern.
+     * <p>路径匹配模板 -> servlet名称，即Wrapper容器名称</p>
      */
     private HashMap<String, String> servletMappings =
         new HashMap<String, String>();
@@ -3531,6 +3532,7 @@ public class StandardContext extends ContainerBase
             String name2 = servletMappings.get(decodedPattern);
             if (name2 != null) {
                 // Don't allow more than one servlet on the same pattern
+                // 一个servlet不允许两个及以上相同的url匹配模板
                 Wrapper wrapper = (Wrapper) findChild(name2);
                 wrapper.removeMapping(decodedPattern);
                 mapper.removeWrapper(decodedPattern);

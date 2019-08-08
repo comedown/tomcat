@@ -370,6 +370,7 @@ public class MapperListener extends LifecycleMBeanBase
     private void registerContext(Context context) {
 
         String contextPath = context.getPath();
+        // ROOT
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
@@ -474,6 +475,7 @@ public class MapperListener extends LifecycleMBeanBase
         boolean resourceOnly = context.isResourceOnlyServlet(wrapperName);
         String[] mappings = wrapper.findMappings();
         for (String mapping : mappings) {
+            // 是否jsp通配符：JspServlet并且以/*通配符结尾
             boolean jspWildCard = (wrapperName.equals("jsp")
                                    && mapping.endsWith("/*"));
             wrappers.add(new WrapperMappingInfo(mapping, wrapper, jspWildCard,

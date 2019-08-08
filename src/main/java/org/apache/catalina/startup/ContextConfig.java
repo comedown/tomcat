@@ -404,6 +404,7 @@ public class ContextConfig implements LifecycleListener {
         } else if (event.getType().equals(Lifecycle.CONFIGURE_STOP_EVENT)) {
             configureStop();
         } else if (event.getType().equals(Lifecycle.AFTER_INIT_EVENT)) {
+            // after_init事件，初始化ContextConfig
             init();
         } else if (event.getType().equals(Lifecycle.AFTER_DESTROY_EVENT)) {
             destroy();

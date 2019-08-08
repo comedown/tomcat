@@ -35,6 +35,8 @@ import org.apache.tomcat.util.res.StringManager;
  * Mapper, which implements the servlet API mapping rules (which are derived
  * from the HTTP rules).
  *
+ * <p>HTTP请求映射，给定url和Host、Context、Wrapper、Mapping关系</p>
+ *
  * @author Remy Maucherat
  */
 public final class Mapper {
@@ -502,7 +504,15 @@ public final class Mapper {
     protected void addWrapper(ContextVersion context, String path,
             Object wrapper, boolean jspWildCard, boolean resourceOnly) {
 
+        // urlPattern只能有五种情况
+        // 1、结尾为通配符：/aa/bb/*；
+        // 2、开头为通配符：*.do、*.html
+        // 3、根路径：/
+        // 4、精确路径：/aa/bb/cc，注意：/aa/*/cc里面的*不是通配符，它只能匹配/aa/*/cc
+        // 5、为空：即根路径 /
         synchronized (context) {
+            // 如果urlPattern设置为/*，那么Wrapper的name为空，
+            // 和/一样，导致welcome请求会匹配这个Servlet
             if (path.endsWith("/*")) {
                 // Wildcard wrapper
                 String name = path.substring(0, path.length() - 2);
@@ -799,6 +809,7 @@ public final class Mapper {
         mappingData.host = mappedHost.object;
 
         // Context mapping
+        // 匹配url和Context路径
         ContextList contextList = mappedHost.contextList;
         Context[] contexts = contextList.contexts;
         int nesting = contextList.nesting;
@@ -836,6 +847,7 @@ public final class Mapper {
         uri.setEnd(uriEnd);
 
         if (!found) {
+            // 存在ROOT，设置Context为ROOT
             if (contexts[0].name.equals("")) {
                 context = contexts[0];
             } else {
@@ -846,8 +858,10 @@ public final class Mapper {
             return;
         }
 
+        // 设置上下文路径
         mappingData.contextPath.setString(context.name);
 
+        // 匹配Context version
         ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
         final int versionCount = contextVersions.length;
@@ -867,10 +881,13 @@ public final class Mapper {
             contextVersion = contextVersions[versionCount - 1];
         }
 
+        // 设置context
         mappingData.context = contextVersion.object;
+        // 设置斜线数量
         mappingData.contextSlashCount = contextVersion.slashCount;
 
         // Wrapper mapping
+        // Wrapper映射查找
         if (!contextVersion.isPaused()) {
             internalMapWrapper(contextVersion, uri, mappingData);
         }
@@ -890,13 +907,19 @@ public final class Mapper {
         int pathEnd = path.getEnd();
         boolean noServletPath = false;
 
+        // 长度和context路径一样，没有Servlet路径
         int length = contextVersion.path.length();
         if (length == (pathEnd - pathOffset)) {
             noServletPath = true;
         }
         int servletPath = pathOffset + length;
+        // 截取servlet路径
         path.setOffset(servletPath);
 
+        // 匹配规则优先级：精确匹配 > 通配符匹配 > 后缀匹配 > welcome > default(/)
+        // /* 将拦截welcome请求
+        // /aa/bb/* 和 *.jsp 都会匹配/aa/bb/index.jsp，但是前者比后者优先级高，将匹配前者
+        // 所以如果自定义servlet的urlPattern为/*的时候，欢迎页面会走自定义servlet，404
         // Rule 1 -- Exact Match
         Wrapper[] exactWrappers = contextVersion.exactWrappers;
         internalMapExactWrapper(exactWrappers, path, mappingData);
@@ -929,6 +952,7 @@ public final class Mapper {
             }
         }
 
+        // 空url，重定向到 /
         if(mappingData.wrapper == null && noServletPath &&
                 contextVersion.mapperContextRootRedirectEnabled) {
             // The path is empty, redirect to "/"
@@ -952,6 +976,7 @@ public final class Mapper {
             boolean checkWelcomeFiles = checkJspWelcomeFiles;
             if (!checkWelcomeFiles) {
                 char[] buf = path.getBuffer();
+                // 以 / 结尾，则校验welcome file
                 checkWelcomeFiles = (buf[pathEnd - 1] == '/');
             }
             if (checkWelcomeFiles) {
@@ -963,6 +988,7 @@ public final class Mapper {
                             contextVersion.welcomeResources[i].length());
                     path.setOffset(servletPath);
 
+                    // 按照优先级匹配welcome path
                     // Rule 4a -- Welcome resources processing for exact macth
                     internalMapExactWrapper(exactWrappers, path, mappingData);
 
@@ -987,6 +1013,7 @@ public final class Mapper {
                         if (file != null && !(file instanceof DirContext) ) {
                             internalMapExtensionWrapper(extensionWrappers, path,
                                                         mappingData, true);
+                            // 如果没有*.jsp匹配模板，走defaultWrapper
                             if (mappingData.wrapper == null
                                 && contextVersion.defaultWrapper != null) {
                                 mappingData.wrapper =
@@ -1172,6 +1199,7 @@ public final class Mapper {
         int pathEnd = path.getEnd();
         int servletPath = path.getOffset();
         int slash = -1;
+        // 从尾部开始找第一个 / 的下表
         for (int i = pathEnd - 1; i >= servletPath; i--) {
             if (buf[i] == '/') {
                 slash = i;
@@ -1179,6 +1207,7 @@ public final class Mapper {
             }
         }
         if (slash >= 0) {
+            // 从尾部开始找第一个 . 下标
             int period = -1;
             for (int i = pathEnd - 1; i > slash; i--) {
                 if (buf[i] == '.') {
@@ -1187,6 +1216,7 @@ public final class Mapper {
                 }
             }
             if (period >= 0) {
+                // 移动光标至 . 后面，即：/aa/bb/cc.jsp，此时path为jsp
                 path.setOffset(period + 1);
                 path.setEnd(pathEnd);
                 Wrapper wrapper = exactFind(wrappers, path);
@@ -1321,18 +1351,21 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
+     * <p>二分查找</p>
      * @see #exactFind(MapElement[], String)
      */
     private static final int find(MapElement[] map, String name) {
-
+        // map是排好序的
         int a = 0;
         int b = map.length - 1;
 
         // Special cases: -1 and 0
+        // 如果map数组没有数据，直接返回
         if (b == -1) {
             return -1;
         }
 
+        // 比第一个还小，直接返回
         if (name.compareTo(map[0].name) < 0) {
             return -1;
         }
@@ -1341,6 +1374,7 @@ public final class Mapper {
         }
 
         int i = 0;
+        // 二分查找
         while (true) {
             i = (b + a) / 2;
             int result = name.compareTo(map[i].name);
@@ -1353,6 +1387,7 @@ public final class Mapper {
             }
             if ((b - a) == 1) {
                 int result2 = name.compareTo(map[b].name);
+                // 返回离name最近的下标
                 if (result2 < 0) {
                     return a;
                 } else {
@@ -1368,6 +1403,7 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements. This
      * will return the element that you were searching for. Otherwise it will
      * return <code>null</code>.
+     * <p>在map数组中精确查找name</p>
      * @see #find(MapElement[], String)
      */
     private static final <E extends MapElement> E exactFind(E[] map,
@@ -1386,9 +1422,11 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements. This
      * will return the element that you were searching for. Otherwise it will
      * return <code>null</code>.
+     * <p>精确查找，匹配名称是否相同</p>
      */
     private static final <E extends MapElement> E exactFind(E[] map,
             CharChunk name) {
+        // 返回匹配到的下标
         int pos = find(map, name);
         if (pos >= 0) {
             E result = map[pos];
@@ -1525,6 +1563,7 @@ public final class Mapper {
 
     /**
      * Return the slash count in a given string.
+     * <p>计算斜线数量</p>
      */
     private static final int slashCount(String name) {
         int pos = -1;
@@ -1539,6 +1578,7 @@ public final class Mapper {
     /**
      * Insert into the right place in a sorted MapElement array, and prevent
      * duplicates.
+     * <p>在排序的MapElement数组中正确的位置插入元素，并防止重复</p>
      */
     private static final boolean insertMap
         (MapElement[] oldMap, MapElement[] newMap, MapElement newElement) {
@@ -1546,8 +1586,10 @@ public final class Mapper {
         if ((pos != -1) && (newElement.name.equals(oldMap[pos].name))) {
             return false;
         }
+        // 拷贝newElement之前的元素
         System.arraycopy(oldMap, 0, newMap, 0, pos + 1);
         newMap[pos + 1] = newElement;
+        // 拷贝newElement之后的元素
         System.arraycopy
             (oldMap, pos + 1, newMap, pos + 2, oldMap.length - pos - 1);
         return true;
@@ -1658,9 +1700,12 @@ public final class Mapper {
     // ------------------------------------------------ ContextList Inner Class
 
 
+    /** Host中Context集合 */
     protected static final class ContextList {
 
+        /** 所有Context元素 */
         public final Context[] contexts;
+        /** （path）路径中斜线数量 */
         public final int nesting;
 
         public ContextList() {
@@ -1699,6 +1744,7 @@ public final class Mapper {
 
 
     protected static final class Context extends MapElement {
+        /** Context所有版本，至少包含一个 */
         public volatile ContextVersion[] versions;
 
         public Context(String name, ContextVersion firstVersion) {
@@ -1707,15 +1753,20 @@ public final class Mapper {
         }
     }
 
-
+    /** Context容器的某个版本信息 */
     protected static final class ContextVersion extends MapElement {
         public String path = null;
+        /** path中斜线的数量 */
         public int slashCount;
         public String[] welcomeResources = new String[0];
         public javax.naming.Context resources = null;
+        /** 请求路径为 / 的Wrapper */
         public Wrapper defaultWrapper = null;
+        /** 精确的url，比如：/home */
         public Wrapper[] exactWrappers = new Wrapper[0];
+        /** 通配符url，比如：/* */
         public Wrapper[] wildcardWrappers = new Wrapper[0];
+        /** 扩展名的url，比如：*.html */
         public Wrapper[] extensionWrappers = new Wrapper[0];
         public int nesting = 0;
         public boolean mapperContextRootRedirectEnabled = false;

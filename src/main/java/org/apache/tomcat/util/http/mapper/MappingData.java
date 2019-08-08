@@ -26,6 +26,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class MappingData {
 
+    /** 主机 */
     public Object host = null;
     public Object context = null;
     public int contextSlashCount = 0;
@@ -33,8 +34,11 @@ public class MappingData {
     public Object wrapper = null;
     public boolean jspWildCard = false;
 
+    /** web应用上下文路径 */
     public MessageBytes contextPath = MessageBytes.newInstance();
+    /** 请求路径 */
     public MessageBytes requestPath = MessageBytes.newInstance();
+    /** wrapper路径，即Servlet urlPattern */
     public MessageBytes wrapperPath = MessageBytes.newInstance();
     public MessageBytes pathInfo = MessageBytes.newInstance();
 
