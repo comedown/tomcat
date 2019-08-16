@@ -87,12 +87,14 @@ public class StandardPipeline extends LifecycleBase
 
     /**
      * The basic Valve (if any) associated with this Pipeline.
+     * <p>管道基础阀门，可以为空。位于管道阀门的最后一个
      */
     protected Valve basic = null;
 
 
     /**
      * The Container with which this Pipeline is associated.
+     * <p>管道所在的容器。
      */
     protected Container container = null;
 
@@ -105,6 +107,7 @@ public class StandardPipeline extends LifecycleBase
 
     /**
      * The first valve associated with this Pipeline.
+     * <p>管道的第一个阀门。
      */
     protected Valve first = null;
     
@@ -267,11 +270,13 @@ public class StandardPipeline extends LifecycleBase
     public void setBasic(Valve valve) {
 
         // Change components if necessary
+        // 如果之前存在基础阀门，则替换掉。
         Valve oldBasic = this.basic;
         if (oldBasic == valve)
             return;
 
         // Stop the old component if necessary
+        // 停止之前的阀门组件。
         if (oldBasic != null) {
             if (getState().isAvailable() && (oldBasic instanceof Lifecycle)) {
                 try {
@@ -290,8 +295,10 @@ public class StandardPipeline extends LifecycleBase
         }
 
         // Start the new component if necessary
+        // 启动新的阀门组件。
         if (valve == null)
             return;
+        // 如果是Contained实例，设置其所属容器。
         if (valve instanceof Contained) {
             ((Contained) valve).setContainer(this.container);
         }
@@ -305,6 +312,7 @@ public class StandardPipeline extends LifecycleBase
         }
 
         // Update the pipeline
+        // 更新管道阀门调用链
         Valve current = first;
         while (current != null) {
             if (current.getNext() == oldBasic) {
@@ -342,6 +350,7 @@ public class StandardPipeline extends LifecycleBase
     public void addValve(Valve valve) {
     
         // Validate that we can add this Valve
+        // 如果Contained实例，设置阀门所属的容器
         if (valve instanceof Contained)
             ((Contained) valve).setContainer(this.container);
 
@@ -357,10 +366,13 @@ public class StandardPipeline extends LifecycleBase
         }
 
         // Add this Valve to the set associated with this Pipeline
+        // 如果first阀门为空，则当前阀门作为第一个，基础阀门作为最后一个。
         if (first == null) {
             first = valve;
             valve.setNext(basic);
-        } else {
+        }
+        // 否则，如果找到basic阀门，则将当前阀门放置在basic前面。
+        else {
             Valve current = first;
             while (current != null) {
                 if (current.getNext() == basic) {

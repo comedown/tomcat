@@ -1392,6 +1392,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * Check this container for an access log and if none is found, look to the
      * parent. If there is no parent and still none is found, use the NoOp
      * access log.
+     * <p>记录访问容器日志，如果没有则查看父容器日志，都没有则NoOp。
      */
     @Override
     public void logAccess(Request request, Response response, long time,
@@ -1399,11 +1400,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         boolean logged = false;
 
+        // 在容器内部记录访问日志
         if (getAccessLog() != null) {
             getAccessLog().log(request, response, time);
             logged = true;
         }
 
+        // 在父容器中记录访问日志
         if (getParent() != null) {
             // No need to use default logger once request/response has been logged
             // once

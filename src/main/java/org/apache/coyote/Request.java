@@ -52,6 +52,20 @@ import org.apache.tomcat.util.http.Parameters;
  *   <li>"org.apache.tomcat.request" - allows access to the low-level
  *       request object in trusted applications 
  * </ul>
+ * <br>
+ * <p>这个表示底层、高效的服务器请求信息。大多数字段都是无需GC的，耗时的操作会延迟到
+ * 用户代码需要这些信息为止。
+ *
+ * <p>使用钩子机制将执行委托给模块。
+ *
+ * <p>该类不已服务用户代码为目的 - 它用于tomcat内部执行高效的请求。用户（Servlets）可以
+ * 使用门面对象访问信息，门面对象提供更高级的请求视图。
+ *
+ * <p>为了延迟解析，请求使用钩子方法getInfo()。定义了一下id：
+ * <ul>
+ *     <li>req.encoding - 返回请求编码</li>
+ *     <li>req.attribute - - 返回模块具体的属性</li>
+ * </ul>
  *
  * @author James Duncan Davidson [duncan@eng.sun.com]
  * @author James Todd [gonzo@eng.sun.com]
@@ -95,7 +109,7 @@ public final class Request {
     /** 不带参数的请求路径 */
     private MessageBytes uriMB = MessageBytes.newInstance();
     private MessageBytes decodedUriMB = MessageBytes.newInstance();
-    /** get请求参数 */
+    /** get请求参数，未解码的 */
     private MessageBytes queryMB = MessageBytes.newInstance();
     /** 请求协议：HTTP/1.1 */
     private MessageBytes protoMB = MessageBytes.newInstance();

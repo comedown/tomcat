@@ -328,6 +328,8 @@ public class Catalina {
         digester.setUseContextClassLoader(true);
 
         // Configure the actions we will be using
+        // 指定解析Server节点规则
+        // className属性指定Server的实现类，默认为org.apache.catalina.core.StandardServer
         digester.addObjectCreate("Server",
                                  "org.apache.catalina.core.StandardServer",
                                  "className");
@@ -336,6 +338,7 @@ public class Catalina {
                             "setServer",
                             "org.apache.catalina.Server");
 
+        // 指定GlobalNamingResources节点规则
         digester.addObjectCreate("Server/GlobalNamingResources",
                                  "org.apache.catalina.deploy.NamingResources");
         digester.addSetProperties("Server/GlobalNamingResources");
@@ -398,6 +401,7 @@ public class Catalina {
         // Add RuleSets for nested elements
         digester.addRuleSet(new NamingRuleSet("Server/GlobalNamingResources/"));
         digester.addRuleSet(new EngineRuleSet("Server/Service/"));
+        // 增加Host规则集
         digester.addRuleSet(new HostRuleSet("Server/Service/Engine/"));
         digester.addRuleSet(new ContextRuleSet("Server/Service/Engine/Host/"));
         addClusterRuleSet(digester, "Server/Service/Engine/Host/Cluster/");

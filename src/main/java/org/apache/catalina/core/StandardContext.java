@@ -418,7 +418,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * The document root for this web application.
-     * <p>BaseName.war</p>
+     * <p>BaseName.war
+     * 也可以是配置指定。
      */
     private String docBase = null;
 

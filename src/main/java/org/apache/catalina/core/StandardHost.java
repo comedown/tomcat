@@ -45,6 +45,13 @@ import org.apache.tomcat.util.ExceptionUtils;
  * child container must be a Context implementation to process the
  * requests directed to a particular web application.
  *
+ * <p>管道阀门：
+ * <ul>
+ *     <li>基础阀门：StandardHostValve</li>
+ *     <li>第一个阀门：AccessLogValve</li>
+ *     <li>第二个阀门：ErrorReportValve</li>
+ * </ul>
+ *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
@@ -62,6 +69,7 @@ public class StandardHost extends ContainerBase implements Host {
     public StandardHost() {
 
         super();
+        // 设置管道基础阀门
         pipeline.setBasic(new StandardHostValve());
 
     }
@@ -794,6 +802,7 @@ public class StandardHost extends ContainerBase implements Host {
     protected synchronized void startInternal() throws LifecycleException {
 
         // Set error report valve
+        // 设置错误日志阀门
         String errorValve = getErrorReportValveClass();
         if ((errorValve != null) && (!errorValve.equals(""))) {
             try {

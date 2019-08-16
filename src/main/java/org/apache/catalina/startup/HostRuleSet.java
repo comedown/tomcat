@@ -39,6 +39,7 @@ public class HostRuleSet extends RuleSetBase {
 
     /**
      * The matching pattern prefix to use for recognizing our elements.
+     * <p>前缀：<i>Server/Service/Engine/</i>
      */
     protected String prefix = null;
 
@@ -82,22 +83,30 @@ public class HostRuleSet extends RuleSetBase {
      * our namespace URI (if any).  This method should only be called
      * by a Digester instance.</p>
      *
+     * <p>Host以及子节点（包括Alias，Cluster，Listener，Valve）的解析规则。
+     * 除了这些，Host还包括Context，
+     *
      * @param digester Digester instance to which the new Rule instances
      *  should be added.
      */
     @Override
     public void addRuleInstances(Digester digester) {
-
+        // 指定Host节点即子节点规则
+        // className属性指定Server的实现类，默认为org.apache.catalina.core.StandardHost
         digester.addObjectCreate(prefix + "Host",
                                  "org.apache.catalina.core.StandardHost",
                                  "className");
+        // 增加设置父容器类加载器规则
         digester.addSetProperties(prefix + "Host");
         digester.addRule(prefix + "Host",
                          new CopyParentClassLoaderRule());
+        // 增加LifecycleListener规则
+        // hostConfigClass属性指定监听器类名，默认org.apache.catalina.startup.HostConfig
         digester.addRule(prefix + "Host",
                          new LifecycleListenerRule
                          ("org.apache.catalina.startup.HostConfig",
                           "hostConfigClass"));
+        // 在Engine容器中调用addChild()加入子容器
         digester.addSetNext(prefix + "Host",
                             "addChild",
                             "org.apache.catalina.Container");
@@ -125,6 +134,8 @@ public class HostRuleSet extends RuleSetBase {
 
         digester.addRuleSet(new RealmRuleSet(prefix + "Host/"));
 
+        // 增加Host Value节点的解析规则
+        // className属性表示Value的实现类名，默认为空，必须在配置文件中指定
         digester.addObjectCreate(prefix + "Host/Valve",
                                  null, // MUST be specified in the element
                                  "className");

@@ -1370,6 +1370,8 @@ public class Response implements HttpServletResponse {
      * Internal method that allows a redirect to be sent with a status other
      * than {@link HttpServletResponse#SC_FOUND} (302). No attempt is made to
      * validate the status code.
+     * <p>内部重定向方法，允许除了{@link HttpServletResponse#SC_FOUND} (302)之外的
+     * 状态码进行发送。不尝试验证状态码。
      */
     public void sendRedirect(String location, int status) throws IOException {
         if (isCommitted()) {

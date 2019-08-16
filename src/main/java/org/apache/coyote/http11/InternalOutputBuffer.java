@@ -63,6 +63,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     /**
      * Underlying output stream. Note: protected to assist with unit testing
+     * <p>下层基础输出流。注意：protected用于单元测试。
      */
     protected OutputStream outputStream;
 

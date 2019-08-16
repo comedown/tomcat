@@ -48,6 +48,9 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected AbstractEndpoint<S> endpoint;
     protected Request request;
     protected Response response;
+    /**
+     * socket连接包装类
+     */
     protected SocketWrapper<S> socketWrapper = null;
     private int maxCookieCount = 200;
 

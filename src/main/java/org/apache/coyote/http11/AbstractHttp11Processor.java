@@ -1019,6 +1019,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the I/O
+        // 设置socket I/O 到内部输入输出缓冲
         setSocketWrapper(socketWrapper);
         getInputBuffer().init(socketWrapper, endpoint);
         getOutputBuffer().init(socketWrapper, endpoint);

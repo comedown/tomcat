@@ -24,6 +24,7 @@ import org.apache.catalina.connector.Response;
 
 /**
  * A helper class that wraps several AccessLog instances.
+ * <p>访问日志适配器，内部保存多个访问日志实例。组合模式。
  */
 public class AccessLogAdapter implements AccessLog {
 

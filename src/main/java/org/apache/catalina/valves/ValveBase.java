@@ -61,6 +61,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
     //------------------------------------------------------ Instance Variables
     /**
      * Does this valve support Servlet 3+ async requests?
+     * <p>是否支持Servlet 3以上版本的异步请求。
      */
     protected boolean asyncSupported;
 

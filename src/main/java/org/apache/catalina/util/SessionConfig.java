@@ -34,6 +34,7 @@ public class SessionConfig {
 
         String result = getConfiguredSessionCookieName(context);
 
+        // 未配置则取默认：JSESSIONID
         if (result == null) {
             result = DEFAULT_SESSION_COOKIE_NAME;
         }
@@ -57,19 +58,30 @@ public class SessionConfig {
         return result;
     }
 
-
+    /**
+     * 获取配置的Session Cookie名称。
+     * 优先级：
+     * 1、Context中定义的Cookie名称。
+     * 2、web应用配置的Cookie名称。
+     * 3、默认的Coolie名称。
+     * @param context
+     * @return
+     */
     private static String getConfiguredSessionCookieName(Context context) {
 
         // Priority is:
         // 1. Cookie name defined in context
         // 2. Cookie name configured for app
         // 3. Default defined by spec
+
+        // 首先从Context中获取定义的Cookie名称
         if (context != null) {
             String cookieName = context.getSessionCookieName();
             if (cookieName != null && cookieName.length() > 0) {
                 return cookieName;
             }
 
+            // 然后从Servlet上下文中Session Cookie配置读取
             SessionCookieConfig scc =
                 context.getServletContext().getSessionCookieConfig();
             cookieName = scc.getName();

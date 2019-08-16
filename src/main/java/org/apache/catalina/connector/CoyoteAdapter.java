@@ -711,6 +711,7 @@ public class CoyoteAdapter implements Adapter {
 
         // URI decoding
         // %xx decoding of the URL
+        // URI中的%xx进行解码
         try {
             req.getURLDecoder().convert(decodedURI, false);
         } catch (IOException ioe) {
@@ -858,6 +859,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Possible redirect
+        // 如果为重定向
         MessageBytes redirectPathMB = request.getMappingData().redirectPath;
         if (!redirectPathMB.isNull()) {
             String redirectPath = urlEncoder.encode(redirectPathMB.toString(), "UTF-8");
@@ -870,12 +872,14 @@ public class CoyoteAdapter implements Adapter {
                             request.getContext()) +
                     "=" + request.getRequestedSessionId();
             }
+            // 拼接上get参数
             if (query != null) {
                 // This is not optimal, but as this is not very common, it
                 // shouldn't matter
                 redirectPath = redirectPath + "?" + query;
             }
             response.sendRedirect(redirectPath);
+            // 记录访问日志
             request.getContext().logAccess(request, response, 0, true);
             return false;
         }
@@ -1082,6 +1086,7 @@ public class CoyoteAdapter implements Adapter {
 
     /**
      * Parse session id in Cookie.
+     * <p>解析Cookie中的session id。
      */
     protected void parseSessionCookiesId(org.apache.coyote.Request req, Request request) {
 

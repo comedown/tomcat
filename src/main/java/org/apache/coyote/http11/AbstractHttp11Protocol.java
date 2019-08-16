@@ -86,6 +86,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    /**
+     * 拒绝非法的请求头参数。返回400，请求错误。
+     */
     private boolean rejectIllegalHeaderName = false;
     /**
      * If an HTTP request is received that contains an illegal header name (i.e.
@@ -128,6 +131,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     /**
      * Maximum size of the HTTP message header.
+     * <p>HTTP信息头最大容量：8M。
      */
     private int maxHttpHeaderSize = 8 * 1024;
     public int getMaxHttpHeaderSize() { return maxHttpHeaderSize; }

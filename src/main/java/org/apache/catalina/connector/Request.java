@@ -683,6 +683,7 @@ implements HttpServletRequest {
 
     /**
      * Mapping data.
+     * <p>请求映射数据。比如Context、Wrapper等。
      */
     protected MappingData mappingData = new MappingData();
 

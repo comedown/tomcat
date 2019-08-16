@@ -37,6 +37,7 @@ public class ContextRuleSet extends RuleSetBase {
 
     /**
      * The matching pattern prefix to use for recognizing our elements.
+     * <p>前缀：<i>Server/Service/Engine/Host/</i>
      */
     protected String prefix = null;
 
@@ -110,6 +111,8 @@ public class ContextRuleSet extends RuleSetBase {
     public void addRuleInstances(Digester digester) {
 
         if (create) {
+            // 解析Context节点规则
+            // className属性指明Context实例类名，默认为org.apache.catalina.core.StandardContext
             digester.addObjectCreate(prefix + "Context",
                     "org.apache.catalina.core.StandardContext", "className");
             digester.addSetProperties(prefix + "Context");

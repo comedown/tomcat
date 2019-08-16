@@ -45,6 +45,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     /**
      * Underlying input stream.
+     * <p>下层基础的输入流。
      */
     private InputStream inputStream;
 
