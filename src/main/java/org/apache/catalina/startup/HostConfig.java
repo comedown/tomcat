@@ -105,6 +105,8 @@ public class HostConfig
 
     /**
      * Config base.
+     * <p>conf/{Engine name}/{Host name} 下的web应用context配置
+     * 默认情况为：conf/Catalina/localhost
      */
     protected File configBase = null;
 
@@ -175,6 +177,7 @@ public class HostConfig
     /**
      * List of applications which are being serviced, and shouldn't be
      * deployed/undeployed/redeployed at the moment.
+     * <p>已被加载服务的web应用，此刻不能再被加载/卸载/重新加载。
      */
     protected ArrayList<String> serviced = new ArrayList<String>();
 
@@ -495,11 +498,13 @@ public class HostConfig
             configBase = returnCanonicalPath(host.getXmlBase());
         } else {
             StringBuilder xmlDir = new StringBuilder("conf");
+            // 获取Engine名称
             Container parent = host.getParent();
             if (parent instanceof Engine) {
                 xmlDir.append('/');
                 xmlDir.append(parent.getName());
             }
+            // 获取Host名称
             xmlDir.append('/');
             xmlDir.append(host.getName());
             configBase = returnCanonicalPath(xmlDir.toString());
@@ -525,7 +530,7 @@ public class HostConfig
 
         // ${catalina.home}/webapps
         File appBase = appBase();
-        // ${catalina.home}/conf/
+        // ${catalina.home}/conf/{Engine name}/{Host name}
         File configBase = configBase();
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         // Deploy XML descriptors from configBase
@@ -1368,6 +1373,7 @@ public class HostConfig
      * @param contextName of the context which will be checked
      */
     protected boolean deploymentExists(String contextName) {
+        // 已发布的或者Host中包含Context名称。
         return (deployed.containsKey(contextName) ||
                 (host.findChild(contextName) != null));
     }

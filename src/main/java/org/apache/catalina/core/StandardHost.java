@@ -94,6 +94,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * The XML root for this Host.
+     * <p>xml配置根目录
      */
     private String xmlBase = null;
 
