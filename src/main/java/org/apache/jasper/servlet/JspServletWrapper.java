@@ -184,6 +184,7 @@ public class JspServletWrapper {
                 // of different pages, but not the same page.
                 if (getReloadInternal() || theServlet == null) {
                     // This is to maintain the original protocol.
+                    // 销毁之前的servlet，维持原始协议
                     destroy();
 
                     final Servlet servlet;

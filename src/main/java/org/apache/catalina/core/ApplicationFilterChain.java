@@ -92,6 +92,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
     /**
      * Filters.
+     * <p>具体过滤器
      */
     private ApplicationFilterConfig[] filters = 
         new ApplicationFilterConfig[0];
@@ -100,18 +101,21 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     /**
      * The int which is used to maintain the current position 
      * in the filter chain.
+     * <p>用于标记过滤器链中当前过滤器的位置。
      */
     private int pos = 0;
 
 
     /**
      * The int which gives the current number of filters in the chain.
+     * <p>过滤器个数
      */
     private int n = 0;
 
 
     /**
      * The servlet instance to be executed by this chain.
+     * <p>过滤器链执行的Servlet
      */
     private Servlet servlet = null;
 
@@ -168,6 +172,9 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * Invoke the next filter in this chain, passing the specified request
      * and response.  If there are no more filters in this chain, invoke
      * the <code>service()</code> method of the servlet itself.
+     *
+     * <p>调用过滤器链中下一个过滤器。传递指定的请求和响应信息。如果过滤器链中没有过滤器，
+     * 直接使用Servlet对象调用它的<code>service()</code>方法。
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
@@ -237,7 +244,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                     SecurityUtil.doAsPrivilege
                         ("doFilter", filter, classType, args, principal);
                     
-                } else {  
+                } else {
+                    // 调用过滤器doFilter()方法
                     filter.doFilter(request, response, this);
                 }
 
@@ -271,6 +279,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
         }
 
         // We fell off the end of the chain -- call the servlet instance
+        // 过滤器链中的过滤器执行完毕，调用Servlet实例
         try {
             if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(request);
@@ -526,6 +535,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     void addFilter(ApplicationFilterConfig filterConfig) {
 
         // Prevent the same filter being added multiple times
+        // 防止过滤器重复加入，调用多次
         for(ApplicationFilterConfig filter:filters)
             if(filter==filterConfig)
                 return;

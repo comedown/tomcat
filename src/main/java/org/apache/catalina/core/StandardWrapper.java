@@ -93,6 +93,7 @@ public class StandardWrapper extends ContainerBase
     public StandardWrapper() {
 
         super();
+        // 设置基础阀门
         swValve=new StandardWrapperValve();
         pipeline.setBasic(swValve);
         broadcaster = new NotificationBroadcasterSupport();
@@ -119,6 +120,7 @@ public class StandardWrapper extends ContainerBase
     /**
      * The count of allocations that are currently active (even if they
      * are for the same instance, as will be true on a non-STM servlet).
+     * <p>当前分配的Servlet实例个数。
      */
     protected AtomicInteger countAllocated = new AtomicInteger(0);
 
@@ -221,6 +223,7 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Number of instances currently loaded for a STM servlet.
+     * <p>当前STM Servlet实例个数。
      */
     protected int nInstances = 0;
 
@@ -862,12 +865,14 @@ public class StandardWrapper extends ContainerBase
                             throw new ServletException(sm.getString("standardWrapper.allocate"), e);
                         }
                     }
+                    // 如果没有初始化，则初始化Servlet
                     if (!instanceInitialized) {
                         initServlet(instance);
                     }
                 }
             }
 
+            // 如果是线程单例模式，并且是新建的实例，则当前实例压栈
             if (singleThreadModel) {
                 if (newInstance) {
                     // Have to do this outside of the sync above to prevent a
@@ -1066,6 +1071,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public synchronized void load() throws ServletException {
+        // 加载，实例化Servlet
         instance = loadServlet();
 
         if (!instanceInitialized) {
@@ -1105,6 +1111,7 @@ public class StandardWrapper extends ContainerBase
         }
 
         // Nothing to do if we already have an instance or an instance pool
+        // 如果不是线程单例模式，并且实例不为null，则直接返回实例
         if (!singleThreadModel && (instance != null))
             return instance;
 
@@ -1123,6 +1130,7 @@ public class StandardWrapper extends ContainerBase
                     (sm.getString("standardWrapper.notClass", getName()));
             }
 
+            // 实例化Servlet
             InstanceManager instanceManager = ((StandardContext)getParent()).getInstanceManager();
             try {
                 servlet = (Servlet) instanceManager.newInstance(servletClass);
@@ -1165,6 +1173,7 @@ public class StandardWrapper extends ContainerBase
 
             classLoadTime=(int) (System.currentTimeMillis() -t1);
 
+            // 如果Servlet是SingleThreadModel的实例，设置标记
             if (servlet instanceof SingleThreadModel) {
                 if (instancePool == null) {
                     instancePool = new Stack<Servlet>();
@@ -1172,6 +1181,7 @@ public class StandardWrapper extends ContainerBase
                 singleThreadModel = true;
             }
 
+            // 调用Servlet初始化方法
             initServlet(servlet);
 
             fireContainerEvent("load", this);
@@ -1202,6 +1212,11 @@ public class StandardWrapper extends ContainerBase
     }
 
 
+    /**
+     * 初始化Servlet，调用init方法
+     * @param servlet
+     * @throws ServletException
+     */
     private synchronized void initServlet(Servlet servlet)
             throws ServletException {
 
@@ -1209,9 +1224,11 @@ public class StandardWrapper extends ContainerBase
 
         // Call the initialization method of this servlet
         try {
+            // 触发初始化前事件
             instanceSupport.fireInstanceEvent(InstanceEvent.BEFORE_INIT_EVENT,
                                               servlet);
 
+            // 调用init(ServletConfig)方法
             if( Globals.IS_SECURITY_ENABLED) {
                 boolean success = false;
                 try {
@@ -1228,11 +1245,14 @@ public class StandardWrapper extends ContainerBase
                     }
                 }
             } else {
+                // init带参数方法中会调用无参init方法
                 servlet.init(facade);
             }
 
+            // 设置已初始化标记
             instanceInitialized = true;
 
+            // 触发初始化后事件
             instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
                                               servlet);
         } catch (UnavailableException f) {

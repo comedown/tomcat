@@ -158,6 +158,7 @@ public class StandardContext extends ContainerBase
     public StandardContext() {
 
         super();
+        // 设置基础阀门
         pipeline.setBasic(new StandardContextValve());
         broadcaster = new NotificationBroadcasterSupport();
         // Set defaults
@@ -5469,6 +5470,7 @@ public class StandardContext extends ContainerBase
         for (ArrayList<Wrapper> list : map.values()) {
             for (Wrapper wrapper : list) {
                 try {
+                    // 加载Wrapper，实例化Servlet，调用init带参数方法
                     wrapper.load();
                 } catch (ServletException e) {
                     getLogger().error(sm.getString("standardContext.loadOnStartup.loadException",
@@ -5626,10 +5628,11 @@ public class StandardContext extends ContainerBase
                     ((Lifecycle) resources).start();
 
                 // Notify our interested LifecycleListeners
-                // @see ContextConfig，启动配置事件
+                // @see ContextConfig，启动配置事件，解析web应用
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started
+                // 如果没有启动子容器（Wrapper），则启动
                 for (Container child : findChildren()) {
                     if (!child.getState().isAvailable()) {
                         child.start();
@@ -5759,6 +5762,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Configure and call application filters
+            // 配置调用web应用过滤器
             if (ok) {
                 if (!filterStart()) {
                     log.error(sm.getString("standardContext.filterFail"));
@@ -5767,6 +5771,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Load and initialize all "load on startup" servlets
+            // 加载并初始化所有loadOnStartup >= 0的servlet
             if (ok) {
                 if (!loadOnStartup(findChildren())){
                     log.error(sm.getString("standardContext.servletFail"));

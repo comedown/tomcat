@@ -49,6 +49,9 @@ import org.apache.tomcat.util.res.StringManager;
  * Facade class that wraps a Coyote request object.
  * All methods are delegated to the wrapped request.
  *
+ * <p>Request的门面接口，内部包装一个网络请求对象。
+ * 所有的方法都会委托给内部请求对象执行。
+ *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  * @author Jean-Francois Arcand

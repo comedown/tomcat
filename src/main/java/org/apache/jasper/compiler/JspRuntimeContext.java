@@ -190,6 +190,7 @@ public final class JspRuntimeContext {
 
     /**
      * Maps JSP pages to their JspServletWrapper's
+     * <p>JSP名称 -> JspServletWrapper
      */
     private final Map<String, JspServletWrapper> jsps =
             new ConcurrentHashMap<String, JspServletWrapper>();

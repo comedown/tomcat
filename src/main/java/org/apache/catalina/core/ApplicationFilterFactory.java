@@ -107,6 +107,7 @@ public final class ApplicationFilterFactory {
         }
         
         // If there is no servlet to execute, return null
+        // 如果Servlet为null，返回null
         if (servlet == null)
             return (null);
 
@@ -124,6 +125,7 @@ public final class ApplicationFilterFactory {
                     req.setFilterChain(filterChain);
                 }
             } else {
+                // 构造过滤器链
                 filterChain = (ApplicationFilterChain) req.getFilterChain();
                 if (filterChain == null) {
                     filterChain = new ApplicationFilterChain();
@@ -141,21 +143,27 @@ public final class ApplicationFilterFactory {
             (((StandardWrapper)wrapper).getInstanceSupport());
 
         // Acquire the filter mappings for this Context
+        // 获取Web应用Context的过滤器映射
         StandardContext context = (StandardContext) wrapper.getParent();
         FilterMap filterMaps[] = context.findFilterMaps();
 
         // If there are no filter mappings, we are done
+        // 如果没有过滤器，直接返回空的过滤器链
         if ((filterMaps == null) || (filterMaps.length == 0))
             return (filterChain);
 
         // Acquire the information we will need to match filter mappings
+        // 获取Servlet的名称，用于匹配过滤器映射
         String servletName = wrapper.getName();
 
         // Add the relevant path-mapped filters to this filter chain
+        // 将相关路径映射过滤器加入到过滤器链
         for (int i = 0; i < filterMaps.length; i++) {
+            // 匹配调度器
             if (!matchDispatcher(filterMaps[i] ,dispatcher)) {
                 continue;
             }
+            // 匹配url
             if (!matchFiltersURL(filterMaps[i], requestPath))
                 continue;
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
@@ -179,15 +187,19 @@ public final class ApplicationFilterFactory {
                     filterChain.addFilter(filterConfig);
                 }
             } else {
+                // 加入过滤器链
                 filterChain.addFilter(filterConfig);
             }
         }
 
         // Add filters that match on servlet name second
+        // 将匹配Servlet名称的过滤器加入过滤器链
         for (int i = 0; i < filterMaps.length; i++) {
+            // 匹配调度器模式
             if (!matchDispatcher(filterMaps[i] ,dispatcher)) {
                 continue;
             }
+            // 匹配Servlet名称
             if (!matchFiltersServlet(filterMaps[i], servletName))
                 continue;
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
@@ -269,10 +281,12 @@ public final class ApplicationFilterFactory {
             return (false);
 
         // Case 1 - Exact Match
+        // 精确匹配，是否相等
         if (testPath.equals(requestPath))
             return (true);
 
         // Case 2 - Path Match ("/.../*")
+        // 通配符匹配
         if (testPath.equals("/*"))
             return (true);
         if (testPath.endsWith("/*")) {
@@ -288,6 +302,7 @@ public final class ApplicationFilterFactory {
         }
 
         // Case 3 - Extension Match
+        // 扩展名匹配
         if (testPath.startsWith("*.")) {
             int slash = requestPath.lastIndexOf('/');
             int period = requestPath.lastIndexOf('.');

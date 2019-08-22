@@ -140,6 +140,7 @@ final class StandardHostValve extends ValveBase {
         }
 
         // Bind the context CL to the current thread
+        // 绑定Context ClassLoader到当前线程
         if( context.getLoader() != null ) {
             // Not started - it should check for availability first
             // This should eventually move to Engine, it's generic.

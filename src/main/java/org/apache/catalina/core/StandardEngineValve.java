@@ -89,6 +89,9 @@ final class StandardEngineValve
      * based on the requested server name.  If no matching Host can
      * be found, return an appropriate HTTP error.
      *
+     * <p>根据请求服务的Server名称，选择合适的Host子容器处理请求。如果找不到匹配的
+     * Host，返回合适的HTTP错误。
+     *
      * @param request Request to be processed
      * @param response Response to be produced
      *
@@ -108,11 +111,13 @@ final class StandardEngineValve
                               request.getServerName()));
             return;
         }
+        // 异步支持
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(host.getPipeline().isAsyncSupported());
         }
 
         // Ask this Host to process this request
+        // 调用Host的管道，处理该请求
         host.getPipeline().getFirst().invoke(request, response);
 
     }

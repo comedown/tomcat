@@ -105,6 +105,7 @@ final class StandardWrapperValve
         Context context = (Context) wrapper.getParent();
 
         // Check for the application being marked unavailable
+        // 检查web应用Context是否状态变为不可获取
         if (!context.getState().isAvailable()) {
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
                            sm.getString("standardContext.isUnavailable"));
@@ -112,6 +113,7 @@ final class StandardWrapperValve
         }
 
         // Check for the servlet being marked unavailable
+        // 检查Servlet容器Wrapper是否状态变为不可获取
         if (!unavailable && wrapper.isUnavailable()) {
             container.getLogger().info(sm.getString("standardWrapper.isUnavailable",
                     wrapper.getName()));
@@ -130,6 +132,7 @@ final class StandardWrapperValve
         }
 
         // Allocate a servlet instance to process this request
+        // 分配Servlet实例处理请求
         try {
             if (!unavailable) {
                 servlet = wrapper.allocate();
@@ -178,6 +181,7 @@ final class StandardWrapperValve
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 requestPathMB);
         // Create the filter chain for this request
+        // 构建请求过滤器链
         ApplicationFilterFactory factory =
             ApplicationFilterFactory.getInstance();
         ApplicationFilterChain filterChain =
@@ -271,6 +275,7 @@ final class StandardWrapperValve
         }
 
         // Release the filter chain (if any) for this request
+        // 释放过滤器链
         if (filterChain != null) {
             if (request.isComet()) {
                 // If this is a Comet request, then the same chain will be used for the

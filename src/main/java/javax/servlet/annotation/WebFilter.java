@@ -93,6 +93,7 @@ public @interface WebFilter {
     String largeIcon() default "";
 
     /**
+     * <p>过滤器匹配的Servlet名称
      * @return array of Servlet names to which this Filter applies
      */
     String[] servletNames() default {};
@@ -106,11 +107,13 @@ public @interface WebFilter {
     String[] value() default {};
 
     /**
+     * <p>过滤器匹配的url模式
      * @return array of URL patterns to which this Filter applies
      */
     String[] urlPatterns() default {};
 
     /**
+     * <p>过滤器匹配的调度器类型
      * @return array of DispatcherTypes to which this filter applies
      */
     DispatcherType[] dispatcherTypes() default {DispatcherType.REQUEST};

@@ -50,6 +50,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *     <li>基础阀门：StandardHostValve</li>
  *     <li>第一个阀门：AccessLogValve</li>
  *     <li>第二个阀门：ErrorReportValve</li>
+ *     <li>第三个阀门：基础阀门</li>
  * </ul>
  *
  * @author Craig R. McClanahan

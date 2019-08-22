@@ -373,10 +373,14 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                                 boolean precompile)
         throws ServletException, IOException {
 
+        // 查找jsp对于的JspServletWrapper
         JspServletWrapper wrapper = rctxt.getWrapper(jspUri);
+        // 找不到则新增
         if (wrapper == null) {
             synchronized(this) {
+                // 在Jsp运行上下文中查找JspServletWrapper
                 wrapper = rctxt.getWrapper(jspUri);
+                // 没有则新建
                 if (wrapper == null) {
                     // Check if the requested JSP page exists, to avoid
                     // creating unnecessary directories and files.

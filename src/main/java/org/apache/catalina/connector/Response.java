@@ -142,6 +142,7 @@ public class Response implements HttpServletResponse {
 
     /**
      * Coyote response.
+     * <p>网络请求对象实例。
      */
     protected org.apache.coyote.Response coyoteResponse;
 
@@ -216,6 +217,7 @@ public class Response implements HttpServletResponse {
 
     /**
      * The characterEncoding flag
+     * <p>是否设置了编码
      */
     private boolean isCharacterEncodingSet = false;
 
@@ -253,12 +255,14 @@ public class Response implements HttpServletResponse {
 
     /**
      * Using output stream flag.
+     * <p>使用OutputStream标志。
      */
     protected boolean usingOutputStream = false;
 
 
     /**
      * Using writer flag.
+     * <p>使用Writer标志。
      */
     protected boolean usingWriter = false;
 
@@ -624,11 +628,13 @@ public class Response implements HttpServletResponse {
     public ServletOutputStream getOutputStream()
         throws IOException {
 
+        // 如果使用Writer标志为true，则抛出异常
         if (usingWriter) {
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.getOutputStream.ise"));
         }
 
+        // 设置使用OutputStream标志为true
         usingOutputStream = true;
         if (outputStream == null) {
             outputStream = new CoyoteOutputStream(outputBuffer);
@@ -849,6 +855,9 @@ public class Response implements HttpServletResponse {
      * of the request. This method must be called prior to reading
      * request parameters or reading input using getReader().
      *
+     * <p>设置字符编码格式，该方法必须在读取请求参数或getReader()、getWriter()
+     * 方法之前调用。
+     *
      * @param charset String containing the name of the character encoding.
      */
     @Override
@@ -865,6 +874,7 @@ public class Response implements HttpServletResponse {
 
         // Ignore any call made after the getWriter has been invoked
         // The default should be used
+        // 如果先调用了getWriter()方法，则该方法不起作用
         if (usingWriter) {
             return;
         }

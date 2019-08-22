@@ -94,6 +94,9 @@ public final class Response {
      */
     String contentType = null;
     String contentLanguage = null;
+    /**
+     * 响应编码，默认ISO-8859-1
+     */
     String characterEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
     long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;

@@ -72,6 +72,7 @@ public final class ByteChunk extends AbstractChunk {
      * Input interface, used when the buffer is empty.
      *
      * Same as java.nio.channels.ReadableByteChannel
+     * <p>输入接口，当缓冲区为空的时候，使用该接口读取数据。
      */
     public static interface ByteInputChannel {
 
@@ -90,6 +91,7 @@ public final class ByteChunk extends AbstractChunk {
      * or send it to a channel.
      *
      * Same as java.nio.channel.WritableByteChannel.
+     * <p>当缓冲区达到阈值(limit)时，用该接口将缓冲区的字节输出到通道中。
      */
     public static interface ByteOutputChannel {
 
@@ -292,6 +294,7 @@ public final class ByteChunk extends AbstractChunk {
         int limit = getLimitInternal();
 
         // couldn't make space
+        // 缓冲区已经满了，先刷新
         if (end >= limit) {
             flushBuffer();
         }
@@ -327,6 +330,7 @@ public final class ByteChunk extends AbstractChunk {
         }
 
         // if we are below the limit
+        // 如果缓冲区足够存放我们写入的字节数，则直接放入
         if (len <= limit - end) {
             System.arraycopy(src, off, buff, end, len);
             end += len;
@@ -340,14 +344,18 @@ public final class ByteChunk extends AbstractChunk {
         // We chunk the data into slices fitting in the buffer limit, although
         // if the data is written directly if it doesn't fit.
 
+        // 否则，计算缓冲区中空余的字节数
         int avail = limit - end;
         System.arraycopy(src, off, buff, end, avail);
         end += avail;
 
+        // 缓冲区满了，刷新
         flushBuffer();
 
+        // 获取剩余的字节数
         int remain = len - avail;
 
+        // 如果缓冲区空余的字节数还不够，直接写入通道
         while (remain > (limit - end)) {
             out.realWriteBytes(src, (off + len) - remain, limit - end);
             remain = remain - (limit - end);
@@ -432,6 +440,9 @@ public final class ByteChunk extends AbstractChunk {
      * Send the buffer to the sink. Called by append() when the limit is
      * reached. You can also call it explicitly to force the data to be written.
      *
+     * <p>将缓冲区的数据发送到通道。当缓冲区大小到达阈值时，有append()方法调用。
+     * 也可以显式调用该方法来强制写入数据。
+     *
      * @throws IOException Writing overflow data to the output channel failed
      */
     public void flushBuffer() throws IOException {
@@ -439,7 +450,9 @@ public final class ByteChunk extends AbstractChunk {
         if (out == null) {
             throw new IOException("Buffer overflow, no sink " + getLimit() + " " + buff.length);
         }
+        // 数据写入通道
         out.realWriteBytes(buff, start, end - start);
+        // 重置起始下标
         end = start;
     }
 
@@ -447,6 +460,8 @@ public final class ByteChunk extends AbstractChunk {
     /**
      * Make space for len bytes. If len is small, allocate a reserve space too.
      * Never grow bigger than the limit or {@link AbstractChunk#ARRAY_MAX_SIZE}.
+     *
+     * <p>为缓冲区扩容。如果指定扩容数量小，则分配预先的空间。
      *
      * @param count The size
      */
@@ -456,14 +471,17 @@ public final class ByteChunk extends AbstractChunk {
         int limit = getLimitInternal();
 
         long newSize;
+        // 期望容量
         long desiredSize = end + count;
 
         // Can't grow above the limit
+        // 超过limit，则缓冲区大小设置为limit
         if (desiredSize > limit) {
             desiredSize = limit;
         }
 
         if (buff == null) {
+            // 缓冲区最小256byte
             if (desiredSize < 256) {
                 desiredSize = 256; // take a minimum
             }
@@ -472,13 +490,16 @@ public final class ByteChunk extends AbstractChunk {
 
         // limit < buf.length (the buffer is already big)
         // or we already have space XXX
+        // 空间足够 直接返回
         if (desiredSize <= buff.length) {
             return;
         }
         // grow in larger chunks
+        // 扩容一倍
         if (desiredSize < 2L * buff.length) {
             newSize = buff.length * 2L;
         } else {
+            // 扩容一倍 + 预期大小
             newSize = buff.length * 2L + count;
         }
 

@@ -77,6 +77,7 @@ final class StandardContextValve extends ValveBase {
         throws IOException, ServletException {
 
         // Disallow any direct access to resources under WEB-INF or META-INF
+        // 不允许直接访问WEB-INF或META-INF下的资源
         MessageBytes requestPathMB = request.getRequestPathMB();
         if ((requestPathMB.startsWithIgnoreCase("/META-INF/", 0))
                 || (requestPathMB.equalsIgnoreCase("/META-INF"))

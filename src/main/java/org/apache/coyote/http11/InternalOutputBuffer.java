@@ -63,7 +63,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     /**
      * Underlying output stream. Note: protected to assist with unit testing
-     * <p>下层基础输出流。注意：protected用于单元测试。
+     * <p>底层基础输出流。注意：protected用于单元测试。
      */
     protected OutputStream outputStream;
 
@@ -209,6 +209,7 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
 
     /**
      * Callback to write data from the buffer.
+     * <p>由缓冲流调用，写入数据到Socket。
      */
     @Override
     public void realWriteBytes(byte cbuf[], int off, int len)

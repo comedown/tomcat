@@ -37,6 +37,9 @@ import org.apache.tomcat.util.res.StringManager;
  * Facade class that wraps a Coyote response object.
  * All methods are delegated to the wrapped response.
  *
+ * <p>Response的门面接口，内部包装一个网络响应对象。
+ * 所有的方法都会委托给内部响应对象执行。
+ *
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
  */

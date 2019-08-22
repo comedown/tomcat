@@ -67,6 +67,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
     /**
      * The Container whose pipeline this Valve is a component of.
+     * <p>阀门所属管道所在的容器。
      */
     protected Container container = null;
 
@@ -87,6 +88,7 @@ public abstract class ValveBase extends LifecycleMBeanBase
 
     /**
      * The next Valve in the pipeline this Valve is a component of.
+     * <p>管道当前阀门的下个阀门。
      */
     protected Valve next = null;
 

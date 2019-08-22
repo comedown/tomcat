@@ -384,6 +384,9 @@ public class DefaultServlet
         // This method must construct a complete context rooted path, although
         // subclasses can change this behaviour.
 
+        // DefaultServlet可以映射'/' 或者 '/path/*'，但是始终使用基于Web应用上下文根路径
+        // 中的资源提供服务。
+
         String servletPath;
         String pathInfo;
 

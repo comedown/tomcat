@@ -49,8 +49,10 @@ public class OutputBuffer extends Writer
     // -------------------------------------------------------------- Constants
 
 
+    /** 默认编码: ISO-8859-1 */
     public static final String DEFAULT_ENCODING =
         org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
+    /** 默认缓冲大小：8KB */
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
 
 
@@ -59,12 +61,14 @@ public class OutputBuffer extends Writer
 
     /**
      * The byte buffer.
+     * <p>字节块
      */
     private final ByteChunk bb;
 
 
     /**
      * The chunk buffer.
+     * <p>字符块
      */
     private final CharChunk cb;
 
@@ -89,12 +93,14 @@ public class OutputBuffer extends Writer
 
     /**
      * Flag which indicates if the output buffer is closed.
+     * <p>输出缓冲流关闭标志。
      */
     private boolean closed = false;
 
 
     /**
      * Do a flush on the next operation.
+     * <p>是否执行刷新缓冲区操作。
      */
     private boolean doFlush = false;
 
@@ -144,6 +150,7 @@ public class OutputBuffer extends Writer
 
     /**
      * Suspended flag. All output bytes will be swallowed if this is true.
+     * <p>挂起标志。如果为true，所有字节都会被丢弃。
      */
     private boolean suspended = false;
 

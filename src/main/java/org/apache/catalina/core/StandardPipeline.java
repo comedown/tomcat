@@ -88,6 +88,7 @@ public class StandardPipeline extends LifecycleBase
     /**
      * The basic Valve (if any) associated with this Pipeline.
      * <p>管道基础阀门，可以为空。位于管道阀门的最后一个
+     * 用于连接父容器和子容器。
      */
     protected Valve basic = null;
 

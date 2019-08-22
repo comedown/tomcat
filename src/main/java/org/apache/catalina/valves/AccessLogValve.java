@@ -1013,6 +1013,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * Log a message summarizing the specified request and response, according
      * to the format specified by the <code>pattern</code> property.
      *
+     * <p>根据<code>pattern</code>属性指定的格式记录指定请求和响应的概述日志。
+     *
      * @param request Request being processed
      * @param response Response being processed
      *

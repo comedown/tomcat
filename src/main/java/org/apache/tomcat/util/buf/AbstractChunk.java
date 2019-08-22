@@ -38,6 +38,9 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     protected boolean isSet;
 
+    /**
+     * 缓冲区大小阈值
+     */
     private int limit = -1;
 
     protected int start;
@@ -61,7 +64,10 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         return limit;
     }
 
-
+    /**
+     * 获取阈值，最大为ARRAY_MAX_SIZE
+     * @return
+     */
     protected int getLimitInternal() {
         if (limit > 0) {
             return limit;
