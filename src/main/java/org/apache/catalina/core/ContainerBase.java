@@ -1604,8 +1604,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected void threadStart() {
 
+        // 已存在线程，直接返回
         if (thread != null)
             return;
+        // 后台任务执行间隔小于等于时，不创建线程
         if (backgroundProcessorDelay <= 0)
             return;
 
@@ -1691,6 +1693,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
         }
 
+        /**
+         * 处理该容器以及其子容器的后台程序，即backgroundProcess()方法。
+         * @param container
+         * @param cl
+         */
         protected void processChildren(Container container, ClassLoader cl) {
             try {
                 if (container.getLoader() != null) {

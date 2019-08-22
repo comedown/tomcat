@@ -75,6 +75,9 @@ public interface Valve {
      * Execute a periodic task, such as reloading, etc. This method will be
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
+     *
+     * <p>周期性任务执行的方法，用于重新加载等操作。这个方法由加载容器的类加载上下文中调用。
+     * 异常将会被捕获并记录日志。
      */
     public void backgroundProcess();
 

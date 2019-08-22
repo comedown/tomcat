@@ -244,6 +244,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * The PrintWriter to which we are currently logging, if any.
+     * <p>写入日志文件的字符流
      */
     protected PrintWriter writer = null;
 
@@ -269,6 +270,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The current log file we are writing to. Helpful when checkExists
      * is true.
+     * <p>当前的access_log日志文件
      */
     protected File currentLogFile = null;
 
@@ -573,8 +575,12 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The number of days to retain the access log files before they are
      * removed.
+     * <p>文件保留的天数，过期后删除文件。默认为-1，表示永不删除。
      */
     private int maxDays = -1;
+    /**
+     * 是否需要检查旧的log文件，新增一个log文件置为true，
+     */
     private volatile boolean checkForOldLogs = false;
 
 
@@ -961,24 +967,30 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     public synchronized void backgroundProcess() {
         if (getState().isAvailable() && getEnabled() && writer != null &&
                 buffered) {
+            // 刷新输出流
             writer.flush();
         }
 
+        // copy，保存当前时刻的变量值，防止被其他线程修改。
         int maxDays = this.maxDays;
         String prefix = this.prefix;
         String suffix = this.suffix;
 
         if (rotatable && checkForOldLogs && maxDays > 0) {
+            // 计算要删除的最近修改时间小于deleteIfLastModifiedBefore的文件
             long deleteIfLastModifiedBefore =
                     System.currentTimeMillis() - (maxDays * 24L * 60 * 60 * 1000);
+            // 获取logs目录
             File dir = getDirectoryFile();
             if (dir.isDirectory()) {
+                // 遍历access_log文件
                 String[] oldAccessLogs = dir.list();
 
                 if (oldAccessLogs != null) {
                     for (String oldAccessLog : oldAccessLogs) {
                         boolean match = false;
 
+                        // 匹配前缀
                         if (prefix != null && prefix.length() > 0) {
                             if (!oldAccessLog.startsWith(prefix)) {
                                 continue;
@@ -986,6 +998,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                             match = true;
                         }
 
+                        // 匹配后缀
                         if (suffix != null && suffix.length() > 0) {
                             if (!oldAccessLog.endsWith(suffix)) {
                                 continue;
@@ -995,6 +1008,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
                         if (match) {
                             File file = new File(dir, oldAccessLog);
+                            // 如果最近修改时间小于最大保持的天数，删除文件
                             if (file.isFile() && file.lastModified() < deleteIfLastModifiedBefore) {
                                 if (!file.delete()) {
                                     log.warn(sm.getString(
