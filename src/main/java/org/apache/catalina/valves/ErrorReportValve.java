@@ -41,6 +41,10 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * <p>HTML code from the Cocoon 2 project.</p>
  *
+ * <br>
+ * <p>用于输出HTML错误页的阀门。比如：404、503
+ * <p>该阀门应该绑定在Host容器上，尽管绑定在Context容器也能工作。
+ *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
@@ -101,6 +105,7 @@ public class ErrorReportValve extends ValveBase {
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
         // Perform the request
+        // 调用处理请求阀门
         getNext().invoke(request, response);
 
         if (response.isCommitted()) {
@@ -121,6 +126,7 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
+        // 获取错误异常
         Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
         // If an async request is in progress and is not going to end once this
@@ -171,17 +177,20 @@ public class ErrorReportValve extends ValveBase {
         // Do nothing if anything has been written already
         // Do nothing if the response hasn't been explicitly marked as in error
         //    and that error has not been reported.
+        // 状态码大于等于400 或者 还有数据没有写入 或者 设置已报告错误标志失败
         if (statusCode < 400 || response.getContentWritten() > 0 || !response.setErrorReported()) {
             return;
         }
         String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
+            // 错误信息为空，从异常信息中找
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
                 if (exceptionMessage != null && exceptionMessage.length() > 0) {
                     message = RequestUtil.filter((new Scanner(exceptionMessage)).nextLine());
                 }
             }
+            // 否则置为空
             if (message == null) {
                 message = "";
             }
@@ -218,6 +227,7 @@ public class ErrorReportValve extends ValveBase {
         sb.append(smClient.getString("errorReportValve.statusHeader",
                 String.valueOf(statusCode), reason));
         sb.append("</title>");
+        // tomcat内部错误页面css
         sb.append("<style type=\"text/css\">");
         sb.append(TomcatCSS.TOMCAT_CSS);
         sb.append("</style>");
@@ -236,17 +246,21 @@ public class ErrorReportValve extends ValveBase {
                 sb.append(smClient.getString("errorReportValve.statusReport"));
             }
             sb.append("</p>");
+            // 如果错误信息不为空，展示错误信息：Message
             if (!message.isEmpty()) {
                 sb.append("<p><b>");
+                // 获取标题：message
                 sb.append(smClient.getString("errorReportValve.message"));
                 sb.append("</b> ");
                 sb.append(message).append("</p>");
             }
+            // 描述：Description
             sb.append("<p><b>");
             sb.append(smClient.getString("errorReportValve.description"));
             sb.append("</b> ");
             sb.append(description);
             sb.append("</p>");
+            // 如果异常不为空，展示异常堆栈信息：Exception
             if (throwable != null) {
                 String stackTrace = getPartialServletStackTrace(throwable);
                 sb.append("<p><b>");
@@ -312,6 +326,7 @@ public class ErrorReportValve extends ValveBase {
     /**
      * Print out a partial servlet stack trace (truncating at the last
      * occurrence of javax.servlet.).
+     * <p>打印出Servlet部分异常堆栈（在最后一次出现javax.servlet.时截断）。
      */
     protected String getPartialServletStackTrace(Throwable t) {
         StringBuilder trace = new StringBuilder();
@@ -319,6 +334,7 @@ public class ErrorReportValve extends ValveBase {
         StackTraceElement[] elements = t.getStackTrace();
         int pos = elements.length;
         for (int i = elements.length - 1; i >= 0; i--) {
+            // 截取调用拦截器之后的异常，屏蔽tomcat内部堆栈
             if ((elements[i].getClassName().startsWith
                  ("org.apache.catalina.core.ApplicationFilterChain"))
                 && (elements[i].getMethodName().equals("internalDoFilter"))) {
@@ -327,6 +343,7 @@ public class ErrorReportValve extends ValveBase {
             }
         }
         for (int i = 0; i < pos; i++) {
+            // 屏蔽tomcat内部堆栈信息
             if (!(elements[i].getClassName().startsWith
                   ("org.apache.catalina.core."))) {
                 trace.append('\t').append(elements[i].toString()).append('\n');

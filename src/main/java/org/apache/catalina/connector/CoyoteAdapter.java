@@ -480,6 +480,7 @@ public class CoyoteAdapter implements Adapter {
                 }
             } else if (!comet) {
                 try {
+                    // 完成请求和响应，关闭io流、socket
                     request.finishRequest();
                     response.finishResponse();
                 } finally {

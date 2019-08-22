@@ -49,6 +49,8 @@ public final class RequestUtil {
      * in HTML.  This avoids potential attacks caused by including JavaScript
      * codes in the request URL that is often reported in error messages.
      *
+     * <p>替换掉错误信息中HTML的转义字符。
+     *
      * @param message The message string to be filtered
      */
     public static String filter(String message) {
