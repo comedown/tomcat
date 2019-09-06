@@ -1155,7 +1155,9 @@ public class StandardWrapper extends ContainerBase
                     (sm.getString("standardWrapper.instantiate", servletClass), e);
             }
 
+            // 生成multipart/form-data请求配置
             if (multipartConfigElement == null) {
+                // 根据注解生成配置
                 MultipartConfig annotation =
                         servlet.getClass().getAnnotation(MultipartConfig.class);
                 if (annotation != null) {

@@ -136,6 +136,7 @@ implements HttpServletRequest {
 
     /**
      * Coyote request.
+     * <p>网络请求，Connector的请求对象。
      */
     protected org.apache.coyote.Request coyoteRequest;
 
@@ -292,6 +293,7 @@ implements HttpServletRequest {
 
     /**
      * Request parameters parsed flag.
+     * <p>请求参数是否解析过标志。
      */
     protected boolean parametersParsed = false;
 
@@ -329,12 +331,14 @@ implements HttpServletRequest {
 
     /**
      * The parts, if any, uploaded with this request.
+     * <p>multipart/form-data的参数集合
      */
     protected Collection<Part> parts = null;
 
 
     /**
      * The exception thrown, if any when parsing the parts.
+     * <p>解析part时发生的异常
      */
     protected Exception partsParseException = null;
 
@@ -1155,6 +1159,7 @@ implements HttpServletRequest {
     @Override
     public String getParameter(String name) {
 
+        // 未解析过，先解析参数
         if (!parametersParsed) {
             parseParameters();
         }
@@ -2840,9 +2845,11 @@ implements HttpServletRequest {
             return;
         }
 
+        // 获取servlet处理multipart请求配置
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
 
         if (mce == null) {
+            // 是否始终允许处理multipart请求
             if(getContext().getAllowCasualMultipartParsing()) {
                 mce = new MultipartConfigElement(null,
                         connector.getMaxPostSize(),
@@ -2860,12 +2867,15 @@ implements HttpServletRequest {
         boolean success = false;
         try {
             File location;
+            // 获取临时文件路径
             String locationStr = mce.getLocation();
+            // 默认为${CATALINA_HOME}/work/[Engine name]/[Host name]/[Context name]
             if (locationStr == null || locationStr.length() == 0) {
                 location = ((File) context.getServletContext().getAttribute(
                         ServletContext.TEMPDIR));
             } else {
                 // If relative, it is relative to TEMPDIR
+                // 如果是相对路径，则是相对于TEMPDIR的路径
                 location = new File(locationStr);
                 if (!location.isAbsolute()) {
                     location = new File(
@@ -2878,6 +2888,7 @@ implements HttpServletRequest {
             if (!location.exists() && context.getCreateUploadTargets()) {
                 log.warn(sm.getString("coyoteRequest.uploadCreate",
                         location.getAbsolutePath(), ((Wrapper)getMappingData().wrapper).getName()));
+                // 文件路径不存在，创建文件夹
                 if (!location.mkdirs()) {
                     log.warn(sm.getString("coyoteRequest.uploadCreateFail",
                             location.getAbsolutePath()));
@@ -2894,6 +2905,7 @@ implements HttpServletRequest {
 
 
             // Create a new file upload handler
+            // 创建文件上传处理器实例
             DiskFileItemFactory factory = new DiskFileItemFactory();
             try {
                 factory.setRepository(location.getCanonicalFile());
@@ -2927,6 +2939,7 @@ implements HttpServletRequest {
                 for (FileItem item : items) {
                     ApplicationPart part = new ApplicationPart(item, location);
                     parts.add(part);
+                    // fileName属性为空，表示不是文件，获取值，并判断是否超过post请求最大值
                     if (part.getSubmittedFileName() == null) {
                         String name = part.getName();
                         String value = null;
@@ -2947,6 +2960,7 @@ implements HttpServletRequest {
                                 // Should not be possible
                             }
                         }
+                        // 如果maxPostSize >= 0，校验是否超过限制
                         if (maxPostSize >= 0) {
                             // Have to calculate equivalent size. Not completely
                             // accurate but close enough.
@@ -3256,9 +3270,11 @@ implements HttpServletRequest {
 
     /**
      * Parse request parameters.
+     * <p>解析请求参数。
      */
     protected void parseParameters() {
 
+        // 标志已解析
         parametersParsed = true;
 
         Parameters parameters = coyoteRequest.getParameters();
@@ -3293,28 +3309,48 @@ implements HttpServletRequest {
                 return;
             }
 
+            // 获取请求头：Content-Type
             String contentType = getContentType();
             if (contentType == null) {
                 contentType = "";
             }
+            // 获取分号下标
             int semicolon = contentType.indexOf(';');
+            // 分号前面为Content-Type内容
             if (semicolon >= 0) {
                 contentType = contentType.substring(0, semicolon).trim();
             } else {
                 contentType = contentType.trim();
             }
 
+            // 如果请求类型为multipart/form-data，则解析文件部分
+            // multipart/form-data请求：
+            // 1、必须是POST请求
+            // 2、请求头必须包含Content-Type，且内容为multipart/form-data; boundary=${bound}
+            // 其中multipart/form-data表示内容格式，bound表示分割符，类似与:
+            // --${bound}
+            // Content-Disposition: form-data; name="fileName"
+            //
+            // www
+            // --${bound}
+            // Content-Disposition: form-data; name="upload"; filename="h1.jpeg"
+            // Content-Type: image/jpeg
+            //
+            // 文件内容
+            // --${bound}
             if ("multipart/form-data".equals(contentType)) {
                 parseParts();
                 success = true;
                 return;
             }
 
+            // 是否是post方法
             if( !getConnector().isParseBodyMethod(getMethod()) ) {
                 success = true;
                 return;
             }
 
+            // 请求类型
             if (!("application/x-www-form-urlencoded".equals(contentType))) {
                 success = true;
                 return;

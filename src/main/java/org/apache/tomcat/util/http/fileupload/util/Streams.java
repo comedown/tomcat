@@ -40,6 +40,7 @@ public final class Streams {
     /**
      * Default buffer size for use in
      * {@link #copy(InputStream, OutputStream, boolean)}.
+     * <p>{@link #copy(InputStream, OutputStream, boolean)}方法使用的默认缓冲区大小。
      */
     private static final int DEFAULT_BUFFER_SIZE = 8192;
 

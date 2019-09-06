@@ -146,9 +146,15 @@ public final class Request {
      * HTTP specific fields. (remove them ?)
      */
     private long contentLength = -1;
+    /**
+     * Content-Type
+     */
     private MessageBytes contentTypeMB = null;
     private String charEncoding = null;
     private Cookies cookies = new Cookies(headers);
+    /**
+     * post参数
+     */
     private Parameters parameters = new Parameters();
 
     private MessageBytes remoteUser = MessageBytes.newInstance();

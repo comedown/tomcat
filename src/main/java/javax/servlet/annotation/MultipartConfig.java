@@ -46,22 +46,26 @@ import java.lang.annotation.Target;
 public @interface MultipartConfig {
 
     /**
+     * 容器存放临时文件的位置
      * @return location in which the Container stores temporary files
      */
     String location() default "";
 
     /**
+     * 上传文件大小的最大值（单位：byte）
      * @return the maximum size allowed for uploaded files (in bytes)
      */
     long maxFileSize() default -1L;
 
     /**
+     * {@code multipart/form-data}请求允许的最大值
      * @return the maximum size of the request allowed for {@code
      *         multipart/form-data}
      */
     long maxRequestSize() default -1L;
 
     /**
+     * 文件写入磁盘的大小阈值
      * @return the size threshold at which the file will be written to the disk
      */
     int fileSizeThreshold() default 0;

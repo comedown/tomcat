@@ -23,10 +23,22 @@ import javax.servlet.annotation.MultipartConfig;
  * TODO SERVLET3 - Add comments
  */
 public class MultipartConfigElement {
-    
+
+    /**
+     * 上传文件的临时目录路径，默认""
+     */
     private final String location;// = "";
+    /**
+     * 上传文件的最大值，默认-1，表示不限制
+     */
     private final long maxFileSize;// = -1;
+    /**
+     * {@code multipart/form-data}请求允许的最大值
+     */
     private final long maxRequestSize;// = -1;
+    /**
+     * 文件写入磁盘的大小阈值
+     */
     private final int fileSizeThreshold;// = 0;
     
     public MultipartConfigElement(String location) {

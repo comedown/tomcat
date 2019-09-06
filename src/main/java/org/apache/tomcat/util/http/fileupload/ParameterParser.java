@@ -63,6 +63,7 @@ public class ParameterParser {
 
     /**
      * Whether names stored in the map should be converted to lower case.
+     * <p>是否将存储在map中的名称转换为小写。
      */
     private boolean lowerCaseNames = false;
 

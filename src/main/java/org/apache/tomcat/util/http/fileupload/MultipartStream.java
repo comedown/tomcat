@@ -95,11 +95,13 @@ public class MultipartStream {
 
         /**
          * Number of expected bytes, if known, or -1.
+         * <p>期望的字节长度，即请求消息的长度。
          */
         private final long contentLength;
 
         /**
          * Number of bytes, which have been read so far.
+         * <p>目前为止已经读取的字节数。
          */
         private long bytesRead;
 
@@ -172,17 +174,20 @@ public class MultipartStream {
     /**
      * The maximum length of <code>header-part</code> that will be
      * processed (10 kilobytes = 10240 bytes.).
+     * <p><code>header-part</code>的最大长度（10KB）。
      */
     public static final int HEADER_PART_SIZE_MAX = 10240;
 
     /**
      * The default length of the buffer used for processing a request.
+     * <p>用于处理请求的缓冲区的默认长度。
      */
     protected static final int DEFAULT_BUFSIZE = 4096;
 
     /**
      * A byte sequence that marks the end of <code>header-part</code>
      * (<code>CRLFCRLF</code>).
+     * <p>标记<code>header-part</code>结束的字节序列标记符(<code>CRLFCRLF</code>)。
      */
     protected static final byte[] HEADER_SEPARATOR = {CR, LF, CR, LF};
 
@@ -200,6 +205,7 @@ public class MultipartStream {
 
     /**
      * A byte sequence that precedes a boundary (<code>CRLF--</code>).
+     * <p>位于分界线之前的字节序列，即<code>CRLF--</code>。
      */
     protected static final byte[] BOUNDARY_PREFIX = {CR, LF, DASH, DASH};
 
@@ -207,27 +213,32 @@ public class MultipartStream {
 
     /**
      * The input stream from which data is read.
+     * <p>读取数据的流。
      */
     private final InputStream input;
 
     /**
      * The length of the boundary token plus the leading <code>CRLF--</code>.
+     * <p>加上前缀<code>CRLF--</code>的分界线标记长度。
      */
     private int boundaryLength;
 
     /**
      * The amount of data, in bytes, that must be kept in the buffer in order
      * to detect delimiters reliably.
+     * <p>为了可靠地检测分隔符，缓冲区中必须保留的数据量（单位：字节）。
      */
     private final int keepRegion;
 
     /**
      * The byte sequence that partitions the stream.
+     * <p>划分流的字节序列。即分界线的字节数组。包含<code>CRLF--</code>前缀。
      */
     private final byte[] boundary;
 
     /**
      * The table for Knuth-Morris-Pratt search algorithm.
+     * <p>KMP搜索算法表
      */
     private final int[] boundaryTable;
 
@@ -245,6 +256,7 @@ public class MultipartStream {
      * The index of first valid character in the buffer.
      * <br>
      * 0 <= head < bufSize
+     * <p>缓冲区开始下标。
      */
     private int head;
 
@@ -252,6 +264,7 @@ public class MultipartStream {
      * The index of last valid character in the buffer + 1.
      * <br>
      * 0 <= tail <= bufSize
+     * <p>缓冲区结束下标。
      */
     private int tail;
 
@@ -296,6 +309,7 @@ public class MultipartStream {
         }
         // We prepend CR/LF to the boundary to chop trailing CR/LF from
         // body-data tokens.
+        // 预先将CR/LF添加到分界线，以切掉正文数据标记的尾部CR/LF。
         this.boundaryLength = boundary.length + BOUNDARY_PREFIX.length;
         if (bufSize < this.boundaryLength + 1) {
             throw new IllegalArgumentException(
@@ -311,10 +325,13 @@ public class MultipartStream {
         this.boundaryTable = new int[this.boundaryLength + 1];
         this.keepRegion = this.boundary.length;
 
+        // 把分界线前缀拷贝到boundary字节数组
         System.arraycopy(BOUNDARY_PREFIX, 0, this.boundary, 0,
                 BOUNDARY_PREFIX.length);
+        // 把分界线拷贝到boundary字节数组
         System.arraycopy(boundary, 0, this.boundary, BOUNDARY_PREFIX.length,
                 boundary.length);
+        // KMP查找算法的next数组
         computeBoundaryTable();
 
         head = 0;
@@ -365,6 +382,7 @@ public class MultipartStream {
     /**
      * Reads a byte from the <code>buffer</code>, and refills it as
      * necessary.
+     * <p>从缓冲区读取一个字节，
      *
      * @return The next byte from the input stream.
      *
@@ -372,9 +390,11 @@ public class MultipartStream {
      */
     public byte readByte() throws IOException {
         // Buffer depleted ?
+        // 读取到缓冲区结尾了，没有可读字节
         if (head == tail) {
             head = 0;
             // Refill.
+            // 重新填充缓冲区，从请求流中读取
             tail = input.read(buffer, head, bufSize);
             if (tail == -1) {
                 // No more data available.
@@ -384,12 +404,15 @@ public class MultipartStream {
                 notifier.noteBytesRead(tail);
             }
         }
+        // 读取一个字节
         return buffer[head++];
     }
 
     /**
      * Skips a <code>boundary</code> token, and checks whether more
      * <code>encapsulations</code> are contained in the stream.
+     * <p>跳过分界线符号，校验流中是否包含更多的multipart封装。
+     * 紧跟分界线之后的是CRLF，则表示下接下来是form-data数据。
      *
      * @return <code>true</code> if there are more encapsulations in
      *         this stream; <code>false</code> otherwise.
@@ -400,12 +423,17 @@ public class MultipartStream {
      */
     public boolean readBoundary()
             throws FileUploadIOException, MalformedStreamException {
+        // 紧跟分界线后面的两个字节
         byte[] marker = new byte[2];
+        // 是否存在下一个form-data块
         boolean nextChunk = false;
 
+        // 从分界线之后开始读取
         head += boundaryLength;
         try {
+            // 读取分界线后面的一个字节，如果是LF，表示存在请求数据。
             marker[0] = readByte();
+            // 这种情况属于IE5 Mac的bug。
             if (marker[0] == LF) {
                 // Work around IE5 Mac bug with input type=image.
                 // Because the boundary delimiter, not including the trailing
@@ -416,10 +444,13 @@ public class MultipartStream {
                 return true;
             }
 
+            // 读取第二个字节，如果是--，代表结束，无数据。
             marker[1] = readByte();
             if (arrayequals(marker, STREAM_TERMINATOR, 2)) {
                 nextChunk = false;
-            } else if (arrayequals(marker, FIELD_SEPARATOR, 2)) {
+            }
+            // 如果是CRLF，则接下来是请求的数据。
+            else if (arrayequals(marker, FIELD_SEPARATOR, 2)) {
                 nextChunk = true;
             } else {
                 throw new MalformedStreamException(
@@ -466,6 +497,7 @@ public class MultipartStream {
 
     /**
      * Compute the table used for Knuth-Morris-Pratt search algorithm.
+     * <p>使用KMP（Knuth-Morris-Pratt）搜索算法计算分界线表。next数组
      */
     private void computeBoundaryTable() {
         int position = 2;
@@ -499,6 +531,8 @@ public class MultipartStream {
      * <p><strong>TODO</strong> allow limiting maximum header size to
      * protect against abuse.
      *
+     * <p>逐字节的读取multipart数据的请求头，包含尾部的<code>CRLFCRLF</code>标记。
+     *
      * @return The <code>header-part</code> of the current encapsulation.
      *
      * @throws FileUploadIOException if the bytes read from the stream exceeded the size limits.
@@ -509,6 +543,7 @@ public class MultipartStream {
         byte b;
         // to support multi-byte characters
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // 请求头的字节数
         int size = 0;
         while (i < HEADER_SEPARATOR.length) {
             try {
@@ -524,6 +559,7 @@ public class MultipartStream {
                         "Header section has more than %s bytes (maybe it is not properly terminated)",
                         Integer.valueOf(HEADER_PART_SIZE_MAX)));
             }
+            // 记录结尾标记，必须是CR LF CR LF
             if (b == HEADER_SEPARATOR[i]) {
                 i++;
             } else {
@@ -532,6 +568,7 @@ public class MultipartStream {
             baos.write(b);
         }
 
+        // 转成string
         String headers = null;
         if (headerEncoding != null) {
             try {
@@ -598,6 +635,7 @@ public class MultipartStream {
 
     /**
      * Finds the beginning of the first <code>encapsulation</code>.
+     * <p>查找第一个part
      *
      * @return <code>true</code> if an <code>encapsulation</code> was found in
      *         the stream.
@@ -606,20 +644,23 @@ public class MultipartStream {
      */
     public boolean skipPreamble() throws IOException {
         // First delimiter may be not preceded with a CRLF.
+        // 第一个分隔符之前不能是CRLF
         System.arraycopy(boundary, 2, boundary, 0, boundary.length - 2);
         boundaryLength = boundary.length - 2;
         computeBoundaryTable();
         try {
             // Discard all data up to the delimiter.
+            // 丢弃分界线之前的所有数据
             discardBodyData();
 
-            // Read boundary - if succeeded, the stream contains an
-            // encapsulation.
+            // Read boundary - if succeeded, the stream contains an encapsulation.
+            // 读取分界线 - 如果成功，表示流包含multipart请求的封装
             return readBoundary();
         } catch (MalformedStreamException e) {
             return false;
         } finally {
             // Restore delimiter.
+            // 重新恢复分隔符
             System.arraycopy(boundary, 0, boundary, 2, boundary.length - 2);
             boundaryLength = boundary.length;
             boundary[0] = CR;
@@ -674,6 +715,7 @@ public class MultipartStream {
     /**
      * Searches for the <code>boundary</code> in the <code>buffer</code>
      * region delimited by <code>head</code> and <code>tail</code>.
+     * <p>在head和tail之间的缓冲区中搜索分界线位置。返回分界线开头的下标。
      *
      * @return The position of the boundary found, counting from the
      *         beginning of the <code>buffer</code>, or <code>-1</code> if
@@ -765,17 +807,20 @@ public class MultipartStream {
 
         /**
          * The number of bytes, which have been read so far.
+         * <p>该stream流目前为止已经读取的字节数。
          */
         private long total;
-
         /**
+
          * The number of bytes, which must be hold, because
          * they might be a part of the boundary.
+         * <p>必须保留的字节数，因为它们可能是边界的一部分。
          */
         private int pad;
 
         /**
          * The current offset in the buffer.
+         * <p>缓冲区中当前的偏移量。
          */
         private int pos;
 
@@ -818,6 +863,7 @@ public class MultipartStream {
         /**
          * Returns the number of bytes, which are currently
          * available, without blocking.
+         * <p>缓冲区中当前可用且不阻塞的字节数。
          *
          * @throws IOException An I/O error occurs.
          * @return Number of bytes in the buffer.
@@ -860,6 +906,7 @@ public class MultipartStream {
 
         /**
          * Reads bytes into the given buffer.
+         * <p>读取字节到给定缓冲区。
          *
          * @param b The destination buffer, where to write to.
          * @param off Offset of the first byte in the buffer.
@@ -904,13 +951,14 @@ public class MultipartStream {
          * Closes the input stream.
          *
          * @param pCloseUnderlying Whether to close the underlying stream
-         *   (hard close)
+         *   (hard close) 是否关闭基础流
          * @throws IOException An I/O error occurred.
          */
         public void close(boolean pCloseUnderlying) throws IOException {
             if (closed) {
                 return;
             }
+            // 关闭依赖的基础流
             if (pCloseUnderlying) {
                 closed = true;
                 input.close();
@@ -956,6 +1004,7 @@ public class MultipartStream {
 
         /**
          * Attempts to read more data.
+         * <p>读取数据，填充缓冲区
          *
          * @return Number of available bytes
          * @throws IOException An I/O error occurred.

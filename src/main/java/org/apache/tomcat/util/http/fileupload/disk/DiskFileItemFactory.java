@@ -69,6 +69,7 @@ public class DiskFileItemFactory implements FileItemFactory {
 
     /**
      * The directory in which uploaded files will be stored, if stored on disk.
+     * <p>上传的文件存储的目录。
      */
     private File repository;
 

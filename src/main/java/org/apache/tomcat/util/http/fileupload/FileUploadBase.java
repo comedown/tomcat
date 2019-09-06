@@ -126,6 +126,7 @@ public abstract class FileUploadBase {
     /**
      * The maximum size permitted for the complete request, as opposed to
      * {@link #fileSizeMax}. A value of -1 indicates no maximum.
+     * <p>一个完整的请求允许的最大值，而不是{@link #fileSizeMax}。-1表示没有限制。
      */
     private long sizeMax = -1;
 
@@ -280,6 +281,7 @@ public abstract class FileUploadBase {
         List<FileItem> items = new ArrayList<FileItem>();
         boolean successful = false;
         try {
+            // 构建multipart迭代器
             FileItemIterator iter = getItemIterator(ctx);
             FileItemFactory fac = getFileItemFactory();
             if (fac == null) {
@@ -293,6 +295,7 @@ public abstract class FileUploadBase {
                                                    item.isFormField(), fileName);
                 items.add(fileItem);
                 try {
+                    // 拷贝参数内容
                     Streams.copy(item.openStream(), fileItem.getOutputStream(), true);
                 } catch (FileUploadIOException e) {
                     throw (FileUploadException) e.getCause();
@@ -361,6 +364,8 @@ public abstract class FileUploadBase {
     /**
      * Retrieves the boundary from the <code>Content-type</code> header.
      *
+     * <p>从请求头<code>Content-type</code>中获取boundary。
+     *
      * @param contentType The value of the content type header from which to
      *                    extract the boundary value.
      *
@@ -428,6 +433,7 @@ public abstract class FileUploadBase {
     /**
      * Retrieves the field name from the <code>Content-disposition</code>
      * header.
+     * <p>从<code>Content-disposition</code>头中查找字段名称属性。
      *
      * @param headers A <code>Map</code> containing the HTTP request headers.
      *
@@ -445,8 +451,10 @@ public abstract class FileUploadBase {
      */
     private String getFieldName(String pContentDisposition) {
         String fieldName = null;
+        // 必须以form-data开头，不论大小写
         if (pContentDisposition != null
                 && pContentDisposition.toLowerCase(Locale.ENGLISH).startsWith(FORM_DATA)) {
+            // 解析文件消息头的参数
             ParameterParser parser = new ParameterParser();
             parser.setLowerCaseNames(true);
             // Parameter parser can handle null input
@@ -466,6 +474,9 @@ public abstract class FileUploadBase {
      * <p> If there are multiple headers of the same names, the name
      * will map to a comma-separated list containing the values.
      *
+     * <p>解析<code>header-part</code>并以键/值对的形式返回。
+     * 如果包含相同名称的header，则会映射到以逗号作为分隔符的列表中。
+     *
      * @param headerPart The <code>header-part</code> of the current
      *                   <code>encapsulation</code>.
      *
@@ -476,14 +487,18 @@ public abstract class FileUploadBase {
         FileItemHeadersImpl headers = newFileItemHeaders();
         int start = 0;
         for (;;) {
+            // 获取一行的结束下标，比如aa\r\nbb\r\n，则返回2
             int end = parseEndOfLine(headerPart, start);
+            // 该行没有数据，跳过
             if (start == end) {
                 break;
             }
+            // 得到当前行的内容，不包含行分隔符
             StringBuilder header = new StringBuilder(headerPart.substring(start, end));
             start = end + 2;
             while (start < len) {
                 int nonWs = start;
+                // 跳过空格、tab符
                 while (nonWs < len) {
                     char c = headerPart.charAt(nonWs);
                     if (c != ' '  &&  c != '\t') {
@@ -495,6 +510,7 @@ public abstract class FileUploadBase {
                     break;
                 }
                 // Continuation line found
+                // 被空格或tab隔开的，则继续查找行，拼接为一行
                 end = parseEndOfLine(headerPart, nonWs);
                 header.append(" ").append(headerPart.substring(nonWs, end));
                 start = end + 2;
@@ -514,6 +530,7 @@ public abstract class FileUploadBase {
 
     /**
      * Skips bytes until the end of the current line.
+     * <p>获取一行，以\r\n作为一行的结束标志。返回\r的下标。
      * @param headerPart The headers, which are being parsed.
      * @param end Index of the last byte, which has yet been
      *   processed.
@@ -537,16 +554,21 @@ public abstract class FileUploadBase {
 
     /**
      * Reads the next header line.
+     * <p>解析消息头行
      * @param headers String with all headers.
      * @param header Map where to store the current header.
      */
     private void parseHeaderLine(FileItemHeadersImpl headers, String header) {
+        // name和value通过冒号分隔
         final int colonOffset = header.indexOf(':');
         if (colonOffset == -1) {
             // This header line is malformed, skip it.
+            // 格式不正确，跳过
             return;
         }
+        // 消息头name
         String headerName = header.substring(0, colonOffset).trim();
+        // 消息头value
         String headerValue =
             header.substring(header.indexOf(':') + 1).trim();
         headers.addHeader(headerName, headerValue);
@@ -555,6 +577,7 @@ public abstract class FileUploadBase {
     /**
      * The iterator, which is returned by
      * {@link FileUploadBase#getItemIterator(RequestContext)}.
+     * <p>mutilpart/form-data请求的参数迭代器。
      */
     private class FileItemIteratorImpl implements FileItemIterator {
 
@@ -595,6 +618,7 @@ public abstract class FileUploadBase {
 
             /**
              * The headers, if any.
+             * <p>文件消息头
              */
             private FileItemHeaders headers;
 
@@ -611,12 +635,18 @@ public abstract class FileUploadBase {
             FileItemStreamImpl(String pName, String pFieldName,
                     String pContentType, boolean pFormField,
                     long pContentLength) throws IOException {
+                // 文件名称
                 name = pName;
+                // 字段名称
                 fieldName = pFieldName;
+                // part的Context-Type属性
                 contentType = pContentType;
+                // 是否表单字段
                 formField = pFormField;
+                // 新建一个part流
                 final ItemInputStream itemStream = multi.newInputStream();
                 InputStream istream = itemStream;
+                // 如果限制了上传文件的最大值，则构建限制流LimitedInputStream
                 if (fileSizeMax != -1) {
                     if (pContentLength != -1
                             &&  pContentLength > fileSizeMax) {
@@ -756,31 +786,37 @@ public abstract class FileUploadBase {
 
         /**
          * The boundary, which separates the various parts.
+         * <p>请求头Content-Type中的boundary的值。
          */
         private final byte[] boundary;
 
         /**
          * The item, which we currently process.
+         * <p>当前正在处理的part
          */
         private FileItemStreamImpl currentItem;
 
         /**
          * The current items field name.
+         * <p>当前part的字段名称
          */
         private String currentFieldName;
 
         /**
          * Whether we are currently skipping the preamble.
+         * <p>是否跳过开头
          */
         private boolean skipPreamble;
 
         /**
          * Whether the current item may still be read.
+         * <p>当前part是否有效（可读）
          */
         private boolean itemValid;
 
         /**
          * Whether we have seen the end of the file.
+         * <p>是否遇到文件结束符：eof。
          */
         private boolean eof;
 
@@ -798,6 +834,7 @@ public abstract class FileUploadBase {
                 throw new NullPointerException("ctx parameter");
             }
 
+            // 校验请求头Content-Type
             String contentType = ctx.getContentType();
             if ((null == contentType)
                     || (!contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART))) {
@@ -807,6 +844,7 @@ public abstract class FileUploadBase {
             }
 
 
+            // 请求内容长度
             final long requestSize = ((UploadContext) ctx).contentLength();
 
             InputStream input; // N.B. this is eventually closed in MultipartStream processing
@@ -838,6 +876,7 @@ public abstract class FileUploadBase {
                 charEncoding = ctx.getCharacterEncoding();
             }
 
+            // 获取边界分隔符
             boundary = getBoundary(contentType);
             if (boundary == null) {
                 IOUtils.closeQuietly(input); // avoid possible resource leak
@@ -854,12 +893,15 @@ public abstract class FileUploadBase {
             }
             multi.setHeaderEncoding(charEncoding);
 
+            // 跳过开头
             skipPreamble = true;
+            // 获取首个part
             findNextItem();
         }
 
         /**
          * Called for finding the next item, if any.
+         * <p>找到下一个part
          *
          * @return True, if an next item was found, otherwise false.
          * @throws IOException An I/O error occurred.
@@ -874,6 +916,7 @@ public abstract class FileUploadBase {
             }
             for (;;) {
                 boolean nextPart;
+                // 读取第一个part
                 if (skipPreamble) {
                     nextPart = multi.skipPreamble();
                 } else {
@@ -890,11 +933,15 @@ public abstract class FileUploadBase {
                     currentFieldName = null;
                     continue;
                 }
+                // 解析请求头，形如 Content-Disposition: form-data; name="fileName"
                 FileItemHeaders headers = getParsedHeaders(multi.readHeaders());
                 if (currentFieldName == null) {
                     // We're parsing the outer multipart
+                    // 解析外部的multipart消息内容
+                    // 字段名称
                     String fieldName = getFieldName(headers);
                     if (fieldName != null) {
+                        // 内部Content-Type
                         String subContentType = headers.getHeader(CONTENT_TYPE);
                         if (subContentType != null
                                 &&  subContentType.toLowerCase(Locale.ENGLISH)
@@ -906,7 +953,9 @@ public abstract class FileUploadBase {
                             skipPreamble = true;
                             continue;
                         }
+                        // fileName属性
                         String fileName = getFileName(headers);
+                        // 设置当前multipart消息实例
                         currentItem = new FileItemStreamImpl(fileName,
                                 fieldName, headers.getHeader(CONTENT_TYPE),
                                 fileName == null, getContentLength(headers));

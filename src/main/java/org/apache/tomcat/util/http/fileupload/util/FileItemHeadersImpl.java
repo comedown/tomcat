@@ -83,11 +83,13 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
 
     /**
      * Method to add header values to this instance.
+     * <p>添加header键值对
      *
      * @param name name of this header
      * @param value value of this header
      */
     public synchronized void addHeader(String name, String value) {
+        // name转为小写
         String nameLower = name.toLowerCase(Locale.ENGLISH);
         List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {

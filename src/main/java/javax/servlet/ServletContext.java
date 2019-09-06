@@ -52,6 +52,9 @@ import javax.servlet.descriptor.JspConfigDescriptor;
  */
 public interface ServletContext {
 
+    /**
+     * tomcat默认上传文件的临时目录
+     */
     public static final String TEMPDIR = "javax.servlet.context.tempdir";
 
     /**

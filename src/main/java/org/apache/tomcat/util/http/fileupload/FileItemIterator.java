@@ -21,6 +21,7 @@ import java.io.IOException;
 /**
  * An iterator, as returned by
  * {@link FileUploadBase#getItemIterator(RequestContext)}.
+ * <p>mutilpart请求内容迭代器。{@link FileUploadBase#getItemIterator(RequestContext)}方法返回。
  */
 public interface FileItemIterator {
 

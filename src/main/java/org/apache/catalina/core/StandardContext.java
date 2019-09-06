@@ -207,6 +207,8 @@ public class StandardContext extends ContainerBase
      * Allow multipart/form-data requests to be parsed even when the
      * target servlet doesn't specify @MultipartConfig or have a
      * &lt;multipart-config&gt; element.
+     * <p>即使当目标servlet没有指定{@link javax.servlet.annotation.MultipartConfig}
+     * 注解或者没有&lt;multipart-config&gt;元素，也允许解析multipart/form-data请求。
      */
     protected boolean allowCasualMultipartParsing = false;
 
@@ -681,6 +683,7 @@ public class StandardContext extends ContainerBase
     /**
      * The pathname to the work directory for this context (relative to
      * the server's home if not absolute).
+     * <p>工作目录。如果是相对路径，则相对于tomcat目录
      */
     private String workDir = null;
 
@@ -968,6 +971,9 @@ public class StandardContext extends ContainerBase
 
     private final AtomicLong inProgressAsyncCount = new AtomicLong(0);
 
+    /**
+     * 是否创建上传文件目录
+     */
     private boolean createUploadTargets = false;
 
 
@@ -5554,6 +5560,7 @@ public class StandardContext extends ContainerBase
         getCharsetMapper();
 
         // Post work directory
+        // 工作目录
         postWorkDirectory();
 
         // Validate required extensions
@@ -6567,6 +6574,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Set the appropriate context attribute for our work directory.
+     * <p>为工作目录设置合适的上下文属性。
      */
     private void postWorkDirectory() {
 
@@ -6575,6 +6583,7 @@ public class StandardContext extends ContainerBase
         if (workDir == null || workDir.length() == 0) {
 
             // Retrieve our parent (normally a host) name
+            // 检索父容器名称，一般是host
             String hostName = null;
             String engineName = null;
             String hostWorkDir = null;
@@ -6601,9 +6610,12 @@ public class StandardContext extends ContainerBase
             temp = temp.replace('\\', '_');
             if (temp.length() < 1)
                 temp = "_";
+            // host指定了工作目录：host.workDir/[context name[
             if (hostWorkDir != null ) {
                 workDir = hostWorkDir + File.separator + temp;
-            } else {
+            }
+            // 默认工作目录：${catalina.home}/work/[engine name]/[host name]/[context name]
+            else {
                 workDir = "work" + File.separator + engineName +
                     File.separator + hostName + File.separator + temp;
             }
@@ -6611,6 +6623,7 @@ public class StandardContext extends ContainerBase
         }
 
         // Create this directory if necessary
+        // 创建目录
         File dir = new File(workDir);
         if (!dir.isAbsolute()) {
             File catalinaHome = engineBase();
@@ -6629,10 +6642,13 @@ public class StandardContext extends ContainerBase
         }
 
         // Set the appropriate servlet context attribute
+        // 设置ServletContext合适的属性
         if (context == null) {
             getServletContext();
         }
+        // 临时目录
         context.setAttribute(ServletContext.TEMPDIR, dir);
+        // 设置临时目录为只读属性
         context.setAttributeReadOnly(ServletContext.TEMPDIR);
     }
 

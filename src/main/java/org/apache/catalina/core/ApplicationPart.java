@@ -42,6 +42,7 @@ import org.apache.tomcat.util.http.parser.HttpParser;
 public class ApplicationPart implements Part {
 
     private final FileItem fileItem;
+    /** 临时目录路径 */
     private final File location;
 
     public ApplicationPart(FileItem fileItem, File location) {
@@ -141,6 +142,7 @@ public class ApplicationPart implements Part {
     /**
      * Adapted from FileUploadBase.getFileName(). Method name chosen to be
      * consistent with Servlet 3.1.
+     * <P>获取上传的文件名称
      */
     public String getSubmittedFileName() {
         String fileName = null;
