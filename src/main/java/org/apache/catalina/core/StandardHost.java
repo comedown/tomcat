@@ -248,6 +248,9 @@ public class StandardHost extends ContainerBase implements Host {
      * pathname, a relative pathname, or a URL.
      * If null, defaults to
      * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
+     *
+     * <p>XML指定的web应用目录。默认为
+     * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt;
      */
     @Override
     public String getXmlBase() {

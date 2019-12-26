@@ -67,6 +67,7 @@ final class StandardWrapperValve
     private volatile long maxTime;
     private volatile long minTime = Long.MAX_VALUE;
     private final AtomicInteger requestCount = new AtomicInteger(0);
+    /** 错误请求的数量 */
     private final AtomicInteger errorCount = new AtomicInteger(0);
 
 

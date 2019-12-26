@@ -62,7 +62,9 @@ public final class Parameters {
     String encoding=null;
     String queryStringEncoding=null;
 
+    // 参数个数上限
     private int limit = -1;
+    // 参数个数
     private int parameterCount = 0;
 
     /**

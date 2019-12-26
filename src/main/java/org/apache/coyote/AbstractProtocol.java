@@ -840,6 +840,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
     }
 
+    /**
+     *
+     * @param <P>
+     * @param <S>
+     */
     protected static class RecycledProcessors<P extends Processor<S>, S>
             extends ConcurrentLinkedQueue<Processor<S>> {
 

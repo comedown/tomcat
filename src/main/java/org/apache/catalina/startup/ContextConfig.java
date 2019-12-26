@@ -889,6 +889,7 @@ public class ContextConfig implements LifecycleListener {
                     Boolean.valueOf(context.getXmlNamespaceAware())));
         }
 
+        // 读取web应用配置
         webConfig();
 
         if (!context.getIgnoreAnnotations()) {
@@ -1175,7 +1176,7 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Get config base.
-     * <p>${catalina.home}/conf
+     * <p>${catalina.base}/conf
      * @deprecated  Unused - will be removed in 8.0.x
      */
     @Deprecated
@@ -1259,12 +1260,13 @@ public class ContextConfig implements LifecycleListener {
          *   scanned to check if they match.
          */
         Set<WebXml> defaults = new HashSet<WebXml>();
-        // 默认web.xml，${catalina.home}/conf/web.xml
+        // 默认web.xml，${catalina.base}/conf/web.xml
         defaults.add(getDefaultWebXmlFragment());
 
         WebXml webXml = createWebXml();
 
         // Parse context level web.xml
+        // 解析context级别web.xml
         InputSource contextWebXml = getContextWebXmlSource();
         parseWebXml(contextWebXml, webXml, false);
 
@@ -1299,22 +1301,25 @@ public class ContextConfig implements LifecycleListener {
 
         if (!webXml.isMetadataComplete()) {
             // Step 6. Merge web-fragment.xml files into the main web.xml file.
+            // 步骤6：合并web-fragment.xml文件到主web.xml文件
             if (ok) {
                 ok = webXml.merge(orderedFragments);
             }
 
             // Step 7. Apply global defaults
+            // 步骤7：合并应用全局默认的web.xml
             // Have to merge defaults before JSP conversion since defaults
             // provide JSP servlet definition.
             webXml.merge(defaults);
 
             // Step 8. Convert explicitly mentioned jsps to servlets
+            // 步骤8：将显式提到的jsp转换为servlet
             if (ok) {
                 convertJsps(webXml);
             }
 
             // Step 9. Apply merged web.xml to Context
-            // 应用web.xml中的servlet等，转换为Wrapper添加到Context
+            // 步骤9：应用web.xml中的servlet等，转换为Wrapper添加到Context
             if (ok) {
                 webXml.configureContext(context);
             }
@@ -1356,6 +1361,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Step 11. Apply the ServletContainerInitializer config to the context.
+        // 步骤11：在当前context上应用ServletContainerInitializer配置
         if (ok) {
             for (Map.Entry<ServletContainerInitializer,
                     Set<Class<?>>> entry :
@@ -2098,6 +2104,12 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
+    /**
+     * 解析给定类文件中的相关注解
+     * @param file
+     * @param fragment
+     * @param handlesTypesOnly
+     */
     protected void processAnnotationsFile(File file, WebXml fragment,
             boolean handlesTypesOnly) {
 
@@ -2393,6 +2405,12 @@ public class ContextConfig implements LifecycleListener {
                 internalForm.length() - 1).replace('/', '.');
     }
 
+    /**
+     * 解析@WebServlet注解表注的servlet类
+     * @param className
+     * @param ae
+     * @param fragment
+     */
     protected void processAnnotationWebServlet(String className,
             AnnotationEntry ae, WebXml fragment) {
         String servletName = null;
@@ -2466,6 +2484,7 @@ public class ContextConfig implements LifecycleListener {
             } else if ("initParams".equals(name)) {
                 Map<String, String> initParams = processAnnotationWebInitParams(evp
                         .getValue());
+                // 如果web.xml中已存在该servlet，则只取web.xml中未指定的init-param
                 if (isWebXMLservletDef) {
                     Map<String, String> webXMLInitParams = servletDef
                             .getParameterMap();
@@ -2476,7 +2495,9 @@ public class ContextConfig implements LifecycleListener {
                                     .getValue());
                         }
                     }
-                } else {
+                }
+                // 否则全部添加到servlet中
+                else {
                     for (Map.Entry<String, String> entry : initParams
                             .entrySet()) {
                         servletDef.addInitParameter(entry.getKey(), entry

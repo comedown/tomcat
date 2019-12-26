@@ -49,6 +49,13 @@ import java.util.logging.Logger;
  * For light debugging, set the system property
  * <code>org.apache.juli.ClassLoaderLogManager.debug=true</code>.
  * Short configuration information will be sent to <code>System.err</code>.
+ *
+ * <br><br>
+ * <p>唯一的全局日志管理器对象，用于维护有关日志记录器和日志服务的一组共享状态。
+ * 可以使用LogManager.getLogManager()检索全局LogManager对象。LogManager对象是
+ * 在类初始化期间创建的，不能后来更改。
+ * <p>通过系统参数“-Djava.util.logging.manager”指定全局LogManager对象类。
+ * 通过系统参数“-Djava.util.logging.config.file”修改默认日志配置文件路径logging.properties。
  */
 public class ClassLoaderLogManager extends LogManager {
 
@@ -440,6 +447,7 @@ public class ClassLoaderLogManager extends LogManager {
     /**
      * Read configuration for the specified classloader.
      *
+     * <p>读取logging.properties配置
      * @param classLoader
      * @throws IOException Error
      */
@@ -487,6 +495,7 @@ public class ClassLoaderLogManager extends LogManager {
             }
         }
         if ((is == null) && (classLoader == ClassLoader.getSystemClassLoader())) {
+            // 从系统属性获取日志配置文件
             String configFileStr = System.getProperty("java.util.logging.config.file");
             if (configFileStr != null) {
                 try {
@@ -497,6 +506,7 @@ public class ClassLoaderLogManager extends LogManager {
                 }
             }
             // Try the default JVM configuration
+            // 尝试加载JVM默认日志配置文件，在${JAVA_HOME}/jre/lib下面
             if (is == null) {
                 File defaultFile = new File(new File(System.getProperty("java.home"),
                                                      isJava9 ? "conf" : "lib"),
@@ -510,6 +520,7 @@ public class ClassLoaderLogManager extends LogManager {
             }
         }
 
+        // 创建root logger
         Logger localRootLogger = new RootLogger();
         if (is == null) {
             // Retrieve the root logger of the parent classloader instead
@@ -568,6 +579,7 @@ public class ClassLoaderLogManager extends LogManager {
         }
 
         // Create handlers for the root logger of this classloader
+        // 创建当前类加载器的root logger处理器
         String rootHandlers = info.props.getProperty(".handlers");
         String handlers = info.props.getProperty("handlers");
         Logger localRootLogger = info.rootNode.logger;
@@ -582,10 +594,13 @@ public class ClassLoaderLogManager extends LogManager {
                 }
                 // Parse and remove a prefix (prefix start with a digit, such as
                 // "10WebappFooHandler.")
+                // 解析并删除前缀（前缀为一个数字，比如"10WebappFooHandler."）
                 if (Character.isDigit(handlerClassName.charAt(0))) {
                     int pos = handlerClassName.indexOf('.');
                     if (pos >= 0) {
+                        // 前缀
                         prefix = handlerClassName.substring(0, pos + 1);
+                        // handler类型
                         handlerClassName = handlerClassName.substring(pos + 1);
                     }
                 }
@@ -633,6 +648,8 @@ public class ClassLoaderLogManager extends LogManager {
 
     /**
      * System property replacement in the given string.
+     * <p>解析logging.properties路径，此方法表明，系统属性可以这样设置：
+     * -Djava.util.logging.config.file=${catalina.home}/conf/logging.properties
      *
      * @param str The original string
      * @return the modified string
@@ -741,8 +758,17 @@ public class ClassLoaderLogManager extends LogManager {
 
     protected static final class ClassLoaderLogInfo {
         final LogNode rootNode;
+        /**
+         * logger缓存：logger name -> Logger实例
+         */
         final Map<String, Logger> loggers = new ConcurrentHashMap<String, Logger>();
+        /**
+         * handler映射：名称 -> 实例
+         */
         final Map<String, Handler> handlers = new HashMap<String, Handler>();
+        /**
+         * 日志配置属性
+         */
         final Properties props = new Properties();
 
         ClassLoaderLogInfo(final LogNode rootNode) {

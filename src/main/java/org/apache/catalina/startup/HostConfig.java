@@ -191,7 +191,7 @@ public class HostConfig
     /**
      * The list of Wars in the appBase to be ignored because they are invalid
      * (e.g. contain /../ sequences).
-     * <p>无效的war包，包含非法字符序列
+     * <p>无效的war包，包含非法字符序列，比如包含/ ../
      */
     protected Set<String> invalidWars = new HashSet<String>();
 
@@ -272,6 +272,12 @@ public class HostConfig
     }
 
 
+    /**
+     *
+     * @param docBase
+     * @param cn
+     * @return
+     */
     private boolean isDeployThisXML(File docBase, ContextName cn) {
         boolean deployThisXML = isDeployXML();
         if (Globals.IS_SECURITY_ENABLED && !deployThisXML) {
@@ -528,12 +534,14 @@ public class HostConfig
      */
     protected void deployApps() {
 
-        // ${catalina.home}/webapps
+        // ${catalina.base}/webapps
         File appBase = appBase();
-        // ${catalina.home}/conf/{Engine name}/{Host name}
+        // ${catalina.base}/conf/{Engine name}/{Host name}
         File configBase = configBase();
+        // 过滤删除指定路径
         String[] filteredAppPaths = filterAppPaths(appBase.list());
         // Deploy XML descriptors from configBase
+        // 加载configBase目录下XML描述符中的web应用
         deployDescriptors(configBase, configBase.list());
         // Deploy WARs
         deployWARs(appBase, filteredAppPaths);
@@ -546,6 +554,8 @@ public class HostConfig
     /**
      * Filter the list of application file paths to remove those that match
      * the regular expression defined by {@link Host#getDeployIgnore()}.
+     *
+     * <p>过滤应用文件路径集合，删除{@link Host#getDeployIgnore()}指定的正则表达式匹配的路径。
      *
      * @param unfilteredAppPaths    The list of application paths to filter
      *
@@ -625,6 +635,7 @@ public class HostConfig
         for (int i = 0; i < files.length; i++) {
             File contextXml = new File(configBase, files[i]);
 
+            // 必须为xml文件
             if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
                 ContextName cn = new ContextName(files[i], true);
 
@@ -667,6 +678,7 @@ public class HostConfig
 
         Context context = null;
         boolean isExternalWar = false;
+        // 是否非tomcat工作路径下
         boolean isExternal = false;
         File expandedDocBase = null;
         FileInputStream fis = null;
@@ -685,6 +697,7 @@ public class HostConfig
                 }
             }
 
+            // 设置ContextConfig
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener =
                 (LifecycleListener) clazz.newInstance();
@@ -701,6 +714,7 @@ public class HostConfig
                     docBase = new File(appBase(), context.getDocBase());
                 }
                 // If external docBase, register .xml as redeploy first
+                // 如果指定的docBase是外部路径，则先将“.xml”注册为redeploy
                 if (!docBase.getCanonicalPath().startsWith(
                         appBase().getAbsolutePath() + File.separator)) {
                     isExternal = true;
@@ -861,6 +875,7 @@ public class HostConfig
                 }
 
                 // Check for WARs with /../ /./ or similar sequences in the name
+                // 校验WAR包路径是否包含 /../ /./ 这些字符序列
                 if (!validateContextPath(appBase, cn.getBaseName())) {
                     log.error(sm.getString(
                             "hostConfig.illegalWarName", files[i]));

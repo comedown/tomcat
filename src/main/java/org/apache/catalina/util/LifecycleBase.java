@@ -49,6 +49,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
     /**
      * The current state of the source component.
+     * <p>源组件当前的状态
      */
     private volatile LifecycleState state = LifecycleState.NEW;
 

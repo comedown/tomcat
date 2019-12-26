@@ -45,7 +45,16 @@ import javax.servlet.descriptor.JspConfigDescriptor;
  * The <code>ServletContext</code> object is contained within the
  * {@link ServletConfig} object, which the Web server provides the servlet when
  * the servlet is initialized.
- * 
+ *
+ * <br><br>
+ * <p>该类定义了一些列servlet用来和其他servlet容器通信得方法，比如，获取文件MIME类型，转发请求，
+ * 或者写入日志文件。
+ * <p>每个Java虚拟机中的每个web应用只有一个ServletContext。（一个“web应用”是指安装在服务器
+ * URL（比如/catalog）命名空间中的特定子集下的servlet和内容的集合，可能通过.war文件安装。）
+ * <p>
+ * <p><code>ServletContext</code>对象包含在{@link ServletConfig}对象中，Web服务器在
+ * 初始化servlet时提供该对象。
+ *
  * @author Various
  * @see Servlet#getServletConfig
  * @see ServletConfig#getServletContext

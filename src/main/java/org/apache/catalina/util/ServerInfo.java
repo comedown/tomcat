@@ -30,6 +30,8 @@ import org.apache.tomcat.util.ExceptionUtils;
  * Simple utility module to make it easy to plug in the server identifier
  * when integrating Tomcat.
  *
+ * <p>简单公共的模块，用于集成Tomcat时，易于插入服务器标识符。位于catalina包下面的ServerInfo.properties
+ *
  * @author Craig R. McClanahan
  */
 public class ServerInfo {

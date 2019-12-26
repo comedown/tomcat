@@ -40,3 +40,31 @@ java/org/apache/catalina/startup/catalina.properties
 modules/jdbc-pool/bin
 modules/jdbc-pool/includes
 webapps/docs/jdbc-pool.xml
+
+webapps/jasper/
+
+target/
+*.releaseBackup
+*.gitkeep
+
+/.classpath
+/.launch
+/.project
+/.settings
+/*.launch
+/*.tmproj
+/ivy*
+/eclipse
+
+# "temporary" build files
+target/
+out/
+build/
+temp/
+
+## .gitignore for intellij
+
+*.iml
+*.ipr
+*.iws
+.idea/

@@ -1380,6 +1380,9 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * AccessLogElement writes the partial message into the buffer.
+     *
+     * <br><br>
+     * AccessLogElement将部分消息写入缓冲区。
      */
     protected interface AccessLogElement {
         public void addElement(StringBuilder buf, Date date, Request request,

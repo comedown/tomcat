@@ -163,6 +163,7 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Acceptor thread count.
+     * Acceptor线程数量，默认一个。
      */
     protected int acceptorThreadCount = 0;
 
@@ -182,7 +183,7 @@ public abstract class AbstractEndpoint<S> {
     public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
 
 
-    /** 默认为最大工作线程数 -> maxThreads */
+    /** 默认为最大最大连接数，默认和最大工作线程数相同 */
     private int maxConnections = 10000;
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
@@ -546,7 +547,7 @@ public abstract class AbstractEndpoint<S> {
     }
 
 
-    /** 创建执行socket处理逻辑的工作线程 */
+    /** 创建执行socket处理请求逻辑的工作线程 */
     public void createExecutor() {
         internalExecutor = true;
         TaskQueue taskqueue = new TaskQueue();
@@ -759,6 +760,7 @@ public abstract class AbstractEndpoint<S> {
         int count = getAcceptorThreadCount();
         acceptors = new Acceptor[count];
 
+        // 线程名称：http-bio-8080-Acceptor-<count>
         for (int i = 0; i < count; i++) {
             acceptors[i] = createAcceptor();
             String threadName = getName() + "-Acceptor-" + i;
@@ -835,6 +837,10 @@ public abstract class AbstractEndpoint<S> {
         connectionLimitLatch = null;
     }
 
+    /**
+     * 计算连接数或这等待连接
+     * @throws InterruptedException
+     */
     protected void countUpOrAwaitConnection() throws InterruptedException {
         if (maxConnections==-1) return;
         LimitLatch latch = connectionLimitLatch;

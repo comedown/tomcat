@@ -160,6 +160,9 @@ public class StandardWrapper extends ContainerBase
     /**
      * The load-on-startup order value (negative value means load on
      * first call) for this servlet.
+     * <br><br>
+     * load-on-startup指定servlet初始化的顺序值（负数表示在第一次调用时初始化）。
+     * 不指定则默认为-1。
      */
     protected int loadOnStartup = -1;
 

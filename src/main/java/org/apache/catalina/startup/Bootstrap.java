@@ -519,8 +519,10 @@ public final class Bootstrap {
         // 获取bootstrap.jar，user.dir表示项目根目录
         File bootstrapJar =
             new File(System.getProperty("user.dir"), "bootstrap.jar");
+        // 存在bootstrap.jar，则使用bootstrap.jar所在目录的上级目录作为catalina.home
         if (bootstrapJar.exists()) {
             try {
+                // getCanonicalPath会解析“.”和“..”等符号
                 System.setProperty
                     (Globals.CATALINA_HOME_PROP,
                      (new File(System.getProperty("user.dir"), ".."))

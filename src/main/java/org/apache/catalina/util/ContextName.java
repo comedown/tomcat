@@ -21,19 +21,22 @@ import java.util.Locale;
 /**
  * Utility class to manage context names so there is one place where the
  * conversions between baseName, path and version take place.
+ *
+ * <br>
+ * <p>公共类来管理上下文名称，以便在一个地方进行baseName、path和version之间的转换。
  */
 public final class ContextName {
     private static final String ROOT_NAME = "ROOT";
     private static final String VERSION_MARKER = "##";
     private static final String FWD_SLASH_REPLACEMENT = "#";
 
-    /** web应用目录名 */
+    /** web应用名称 */
     private final String baseName;
-    /** 路径：/baseName + version */
+    /** web应用根路径：/baseName + version */
     private final String path;
     /** 版本：用##分隔 */
     private final String version;
-    /** Context容器名称：path + version */
+    /** Context容器名称：path + ## + version */
     private final String name;
     
     /**
@@ -66,14 +69,17 @@ public final class ContextName {
         // Convert Context names and display names to base names
         
         // Strip off any leading "/"
+        // 去掉开头的 “/”
         if (tmp1.startsWith("/")) {
             tmp1 = tmp1.substring(1);
         }
         
         // Replace any remaining /
+        // 替换剩下的“/”为“#”
         tmp1 = tmp1.replaceAll("/", FWD_SLASH_REPLACEMENT);
         
         // Insert the ROOT name if required
+        // 如果有需要插入ROOT名
         if (tmp1.startsWith(VERSION_MARKER) || "".equals(tmp1)) {
             tmp1 = ROOT_NAME + tmp1;
         }
@@ -90,6 +96,7 @@ public final class ContextName {
         
         String tmp2;
         // Extract version number
+        // 提取版本号
         int versionIndex = baseName.indexOf(VERSION_MARKER);
         if (versionIndex > -1) {
             version = baseName.substring(versionIndex + 2);
@@ -99,6 +106,7 @@ public final class ContextName {
             tmp2 = baseName;
         }
 
+        // ROOT项目web根路径为空
         if (ROOT_NAME.equals(tmp2)) {
             path = "";
         } else {

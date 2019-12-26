@@ -128,6 +128,7 @@ exit /B %RETVAL%
 del /Q "%TEMP%\%~nx0.run" >NUL 2>&1
 
 rem Guess CATALINA_HOME if not defined
+rem 如果没有定义CATALINA_HOME，则使用tomcat目录作为CATALINA_HOME
 set "CURRENT_DIR=%cd%"
 if not "%CATALINA_HOME%" == "" goto gotHome
 set "CATALINA_HOME=%CURRENT_DIR%"

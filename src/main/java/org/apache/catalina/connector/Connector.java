@@ -170,6 +170,9 @@ public class Connector extends LifecycleMBeanBase  {
      * The maximum number of parameters (GET plus POST) which will be
      * automatically parsed by the container. 10000 by default. A value of less
      * than 0 means no limit.
+     *
+     * <br><br>
+     * 容器自动解析的参数最大数量（GET和POST）。默认10000，小于0表示不限制
      */
     protected int maxParameterCount = 10000;
 

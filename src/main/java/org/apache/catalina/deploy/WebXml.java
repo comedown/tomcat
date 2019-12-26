@@ -1334,9 +1334,11 @@ public class WebXml {
         context.setEffectiveMajorVersion(getMajorVersion());
         context.setEffectiveMinorVersion(getMinorVersion());
 
+        // 将应用上下文参数设置到context中
         for (Entry<String, String> entry : contextParams.entrySet()) {
             context.addParameter(entry.getKey(), entry.getValue());
         }
+        // web.xml中的displayName
         context.setDisplayName(displayName);
         context.setDistributable(distributable);
         for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
@@ -1348,6 +1350,7 @@ public class WebXml {
         for (ContextEnvironment environment : envEntries.values()) {
             context.getNamingResources().addEnvironment(environment);
         }
+        // 错误页面
         for (ErrorPage errorPage : errorPages.values()) {
             context.addErrorPage(errorPage);
         }

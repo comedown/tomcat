@@ -343,7 +343,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * The ServletContext implementation associated with this Context.
-     * <p>该上下文容器关联的ServletContext。
+     * <p>该上下文容器关联的ServletContext。门面接口
      */
     protected ApplicationContext context = null;
 
@@ -523,6 +523,9 @@ public class StandardContext extends ContainerBase
     /**
      * The context initialization parameters for this web application,
      * keyed by name.
+     *
+     * <br><br>
+     * 此web应用程序的上下文初始化参数，按名称键入。
      */
     private final ConcurrentMap<String, String> parameters = new ConcurrentHashMap<String, String>();
 
@@ -916,7 +919,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Should the effective web.xml be logged when the context starts?
-     * <p>是否在启动context的时候打印有效的web.xml日志。在${catalina.home}/conf/context.xml中配置。
+     * <p>是否在启动context的时候打印有效的web.xml日志。在${catalina.base}/conf/context.xml中配置。
      */
     private boolean logEffectiveWebXml = false;
 
@@ -5733,10 +5736,11 @@ public class StandardContext extends ContainerBase
             }
 
             // Set up the context init params
+            // 设置Context初始化参数
             mergeParameters();
 
             // Call ServletContainerInitializers
-            // 调用ServletContainerInitializers onStartUp()方法
+            // 1、调用ServletContainerInitializers onStartUp()方法
             for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry :
                 initializers.entrySet()) {
                 try {
@@ -5750,6 +5754,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Configure and call application event listeners
+            // 2、配置并调用应用事件监听器
             if (ok) {
                 if (!listenerStart()) {
                     log.error(sm.getString("standardContext.listenerFail"));
@@ -5769,7 +5774,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Configure and call application filters
-            // 配置调用web应用过滤器
+            // 3、配置调用web应用过滤器
             if (ok) {
                 if (!filterStart()) {
                     log.error(sm.getString("standardContext.filterFail"));
@@ -5778,7 +5783,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Load and initialize all "load on startup" servlets
-            // 加载并初始化所有loadOnStartup >= 0的servlet
+            // 4、加载并初始化所有loadOnStartup >= 0的servlet
             if (ok) {
                 if (!loadOnStartup(findChildren())){
                     log.error(sm.getString("standardContext.servletFail"));
@@ -6614,7 +6619,7 @@ public class StandardContext extends ContainerBase
             if (hostWorkDir != null ) {
                 workDir = hostWorkDir + File.separator + temp;
             }
-            // 默认工作目录：${catalina.home}/work/[engine name]/[host name]/[context name]
+            // 默认工作目录：${catalina.base}/work/[engine name]/[host name]/[context name]
             else {
                 workDir = "work" + File.separator + engineName +
                     File.separator + hostName + File.separator + temp;

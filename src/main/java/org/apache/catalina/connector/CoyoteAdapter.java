@@ -489,6 +489,7 @@ public class CoyoteAdapter implements Adapter {
                         // If postParseRequest() failed, it has already logged it.
                         // If context is null this was the start of a comet request
                         // that failed and has already been logged.
+                        // 从context开始往逐层往上记录访问日志
                         ((Context) request.getMappingData().context).logAccess(
                                 request, response,
                                 System.currentTimeMillis() - req.getStartTime(),
@@ -514,6 +515,7 @@ public class CoyoteAdapter implements Adapter {
             req.getRequestProcessor().setWorkerThreadName(null);
 
             // Recycle the wrapper request and response
+            // 回收包装的请求和响应对象
             if (!comet && !async) {
                 request.recycle();
                 response.recycle();

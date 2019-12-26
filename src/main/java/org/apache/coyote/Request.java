@@ -144,6 +144,8 @@ public final class Request {
 
     /**
      * HTTP specific fields. (remove them ?)
+     * <br><br>
+     * HTTP指定字段，请求长度
      */
     private long contentLength = -1;
     /**

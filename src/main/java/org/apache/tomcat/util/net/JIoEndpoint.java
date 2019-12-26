@@ -187,6 +187,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     /**
      * The background thread that listens for incoming TCP/IP connections and
      * hands them off to an appropriate processor.
+     * <br><br>
+     * 监听传入的TCP/IP连接并将其交给适当处理器的后台线程。
      */
     protected class Acceptor extends AbstractEndpoint.Acceptor {
 
@@ -437,9 +439,11 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             // 初始化连接插销
             initializeConnectionLatch();
 
+            // 启动Acceptor连接线程
             startAcceptorThreads();
 
             // Start async timeout thread
+            // 启动异步超时线程
             Thread timeoutThread = new Thread(new AsyncTimeout(),
                     getName() + "-AsyncTimeout");
             timeoutThread.setPriority(threadPriority);

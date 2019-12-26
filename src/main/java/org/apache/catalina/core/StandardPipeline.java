@@ -356,6 +356,7 @@ public class StandardPipeline extends LifecycleBase
             ((Contained) valve).setContainer(this.container);
 
         // Start the new component if necessary
+        // 如果管道处于可获得状态，则启动阀门组件
         if (getState().isAvailable()) {
             if (valve instanceof Lifecycle) {
                 try {

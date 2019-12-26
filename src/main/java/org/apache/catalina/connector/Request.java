@@ -2869,7 +2869,7 @@ implements HttpServletRequest {
             File location;
             // 获取临时文件路径
             String locationStr = mce.getLocation();
-            // 默认为${CATALINA_HOME}/work/[Engine name]/[Host name]/[Context name]
+            // 默认为${CATALINA_BASE}/work/[Engine name]/[Host name]/[Context name]
             if (locationStr == null || locationStr.length() == 0) {
                 location = ((File) context.getServletContext().getAttribute(
                         ServletContext.TEMPDIR));
@@ -3281,6 +3281,7 @@ implements HttpServletRequest {
         boolean success = false;
         try {
             // Set this every time in case limit has been changed via JMX
+            // 每时每刻参数限制都可能通过JMX修改
             parameters.setLimit(getConnector().getMaxParameterCount());
 
             // getCharacterEncoding() may have been overridden to search for
@@ -3356,9 +3357,11 @@ implements HttpServletRequest {
                 return;
             }
 
+            // 请求内容长度
             int len = getContentLength();
 
             if (len > 0) {
+                // 超过POST最大长度（2M），报错
                 int maxPostSize = connector.getMaxPostSize();
                 if ((maxPostSize >= 0) && (len > maxPostSize)) {
                     if (context.getLogger().isDebugEnabled()) {
