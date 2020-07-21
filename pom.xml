@@ -64,7 +64,7 @@
     </dependencies>
  
     <build>
-        <finalName>Tomcat7.x</finalName>
+        <finalName>Tomcat8.5.x</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
             <resource>
